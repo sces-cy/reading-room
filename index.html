@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📚 閱讀密室逃脫</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&family=Cinzel+Decorative:wght@700&display=swap');
+:root{--gold:#c9a84c;--gold-l:#f0d080;--gold-d:#7a5b0e;--deep:#08060f;--panel2:#1a1630;--text:#e8dfc0;--dim:#8a7f60;--purple:#7b52d0;--purple2:#a97fe8;--radius:14px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Serif TC',serif;background:var(--deep);color:var(--text);min-height:100vh;background-image:radial-gradient(ellipse 80% 60% at 20% 40%,rgba(123,82,208,.18) 0%,transparent 70%),radial-gradient(ellipse 60% 50% at 80% 70%,rgba(201,168,76,.10) 0%,transparent 60%);overflow-x:hidden}
+.screen{display:none;min-height:100vh;flex-direction:column;align-items:center;justify-content:center;padding:16px}
+.screen.active{display:flex}
+.z{position:relative;z-index:1}
+#stars{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.st{position:absolute;border-radius:50%;background:#fff;opacity:0;animation:twk var(--d) var(--dl) ease-in-out infinite}
+@keyframes twk{0%,100%{opacity:0}50%{opacity:var(--op)}}
+#toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--panel2);border:1px solid rgba(201,168,76,.45);color:var(--text);padding:11px 22px;border-radius:30px;font-size:14px;z-index:9999;transition:transform .3s;pointer-events:none;white-space:nowrap}
+#toast.show{transform:translateX(-50%) translateY(0)}
+.card{background:linear-gradient(145deg,rgba(26,22,48,.95),rgba(18,16,32,.98));border:1px solid rgba(201,168,76,.22);border-radius:var(--radius);padding:28px 30px;width:100%;max-width:500px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 24px;border-radius:9px;border:none;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:all .18s;letter-spacing:.5px}
+.btn-gold{background:linear-gradient(135deg,var(--gold-d),var(--gold),var(--gold-l));color:#1a1000;box-shadow:0 4px 18px rgba(201,168,76,.4)}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(201,168,76,.6)}
+.btn-purple{background:linear-gradient(135deg,#4a2fa0,var(--purple2));color:#fff;box-shadow:0 4px 18px rgba(123,82,208,.35)}
+.btn-purple:hover{transform:translateY(-2px);box-shadow:0 8px 26px rgba(123,82,208,.55)}
+.btn-ghost{background:transparent;color:var(--dim);border:1px solid rgba(255,255,255,.14)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+.btn-danger{background:rgba(192,57,43,.18);color:#e87070;border:1px solid rgba(192,57,43,.3)}
+.btn-danger:hover{background:rgba(192,57,43,.32)}
+.btn-success{background:rgba(39,174,96,.18);color:#5dde94;border:1px solid rgba(39,174,96,.3)}
+.btn-full{width:100%}
+.btn-sm{padding:7px 14px;font-size:12px}
+.btn-xs{padding:5px 10px;font-size:11px}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+.ig{margin-bottom:14px}
+.ig label{display:block;font-size:11px;color:var(--dim);margin-bottom:5px;letter-spacing:1px}
+input,select,textarea{width:100%;background:rgba(0,0,0,.4);border:1px solid rgba(201,168,76,.28);color:var(--text);padding:10px 14px;border-radius:8px;font-size:15px;font-family:inherit;outline:none;transition:border-color .2s,box-shadow .2s}
+input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.14)}
+select option{background:#1a1630}
+textarea{resize:vertical;line-height:1.6}
+.cinzel{font-family:'Cinzel Decorative',cursive}
+.gold{color:var(--gold)}
+@keyframes flt{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+@keyframes glow{0%,100%{text-shadow:0 0 40px rgba(201,168,76,.7),0 0 90px rgba(201,168,76,.3)}50%{text-shadow:0 0 70px rgba(201,168,76,1),0 0 130px rgba(201,168,76,.5)}}
+@keyframes fdIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+@keyframes roomIn{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes bounce{from{transform:scale(0) rotate(-15deg)}to{transform:scale(1) rotate(0)}}
+@keyframes warn{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* TITLE */
+#titleScreen{gap:18px;text-align:center}
+.title-emoji{font-size:68px;animation:flt 4s ease-in-out infinite}
+.title-glow{font-size:clamp(26px,6vw,52px);color:var(--gold);animation:glow 3s ease-in-out infinite}
+.title-sub{font-size:13px;letter-spacing:4px;color:var(--dim);margin-top:-8px}
+.title-desc{max-width:460px;color:var(--dim);line-height:1.9;font-size:14px;border:1px solid rgba(201,168,76,.18);background:rgba(201,168,76,.05);padding:14px 22px;border-radius:var(--radius)}
+
+/* GAME */
+#gameScreen{justify-content:flex-start;padding:12px;gap:0}
+.g-header{width:100%;max-width:720px;display:flex;align-items:center;justify-content:space-between;padding:10px 18px;background:rgba(18,16,32,.9);border:1px solid rgba(201,168,76,.18);border-radius:var(--radius);margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.g-player{display:flex;align-items:center;gap:10px}
+.g-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--gold));display:flex;align-items:center;justify-content:center;font-size:18px}
+.g-name{font-weight:700;font-size:14px}
+.g-cls{font-size:11px;color:var(--dim)}
+.g-timer{font-size:22px;font-weight:900;color:var(--gold);font-variant-numeric:tabular-nums;letter-spacing:2px}
+.g-timer.warn{color:#e74c3c;animation:warn 1s ease-in-out infinite}
+.stage-pill{background:var(--purple);color:#fff;padding:4px 13px;border-radius:20px;font-size:12px;letter-spacing:1px}
+.g-body{width:100%;max-width:720px;flex:1}
+.prog-wrap{margin-bottom:14px}
+.prog-lbl{font-size:11px;color:var(--dim);display:flex;justify-content:space-between;margin-bottom:5px}
+.prog-bar{height:5px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--gold));border-radius:99px;transition:width .5s ease}
+.room-card{background:linear-gradient(145deg,rgba(26,22,48,.95),rgba(14,12,26,.98));border:1px solid rgba(201,168,76,.2);border-radius:var(--radius);padding:24px 26px;animation:roomIn .35s ease}
+.room-icon{font-size:52px;text-align:center;margin-bottom:12px;animation:flt 3.5s ease-in-out infinite}
+.room-name{color:var(--gold);font-size:20px;font-weight:900;text-align:center;margin-bottom:6px}
+.room-story{color:var(--dim);font-size:13px;line-height:1.85;text-align:center;margin-bottom:18px;padding:11px 14px;background:rgba(0,0,0,.22);border-radius:8px;border-left:3px solid rgba(201,168,76,.35)}
+.q-box{background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:20px}
+.q-meta{font-size:11px;color:var(--dim);letter-spacing:1.5px;margin-bottom:7px}
+.q-text{font-size:17px;font-weight:700;line-height:1.65;margin-bottom:16px}
+.choices{display:grid;gap:9px}
+.c-btn{display:flex;align-items:center;gap:11px;padding:12px 16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:8px;cursor:pointer;text-align:left;font-family:inherit;font-size:14px;color:var(--text);transition:all .18s}
+.c-btn:hover:not(:disabled){background:rgba(201,168,76,.12);border-color:var(--gold);transform:translateX(4px)}
+.c-btn .key{width:26px;height:26px;background:rgba(201,168,76,.18);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:var(--gold);flex-shrink:0}
+.c-btn.correct{background:rgba(39,174,96,.18);border-color:#27ae60}
+.c-btn.wrong{background:rgba(192,57,43,.18);border-color:#c0392b}
+.c-btn:disabled{cursor:not-allowed}
+.fb{display:none;padding:12px 16px;border-radius:8px;font-size:14px;margin-top:10px;align-items:center;gap:9px;animation:fdIn .3s}
+.fb.ok{display:flex;background:rgba(39,174,96,.14);border:1px solid rgba(39,174,96,.38);color:#5dde94}
+.fb.no{display:flex;background:rgba(192,57,43,.14);border:1px solid rgba(192,57,43,.38);color:#e87070}
+.hint-row{display:flex;justify-content:space-between;align-items:center;margin-top:14px;flex-wrap:wrap;gap:6px}
+.hint-lbl{font-size:12px;color:var(--dim)}
+.hint-box{display:none;margin-top:10px;padding:11px 14px;background:rgba(123,82,208,.14);border:1px solid rgba(123,82,208,.38);border-radius:8px;font-size:13px;color:#c5a8e8;animation:fdIn .3s}
+.hint-box.on{display:block}
+.sc{display:none;text-align:center;padding:16px 0;animation:fdIn .4s}
+.sc.on{display:block}
+.sc-emoji{font-size:72px;animation:bounce .5s cubic-bezier(.34,1.56,.64,1);margin-bottom:10px}
+.sc-title{font-size:20px;font-weight:900;color:var(--gold);margin-bottom:6px}
+.sc-msg{color:var(--dim);font-size:14px;line-height:1.7;margin-bottom:18px;max-width:400px;margin-left:auto;margin-right:auto}
+
+/* RESULT */
+#resultScreen{gap:18px;text-align:center}
+.res-trophy{font-size:80px;animation:flt 3.5s ease-in-out infinite}
+.res-card{background:linear-gradient(145deg,rgba(26,22,48,.95),rgba(14,12,26,.98));border:1px solid rgba(201,168,76,.22);border-radius:var(--radius);padding:22px 30px;width:100%;max-width:440px}
+.r-stat{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.r-stat:last-child{border-bottom:none}
+.r-stat .lbl{font-size:13px;color:var(--dim)}
+.r-stat .val{font-size:17px;font-weight:900;color:var(--gold)}
+
+/* LEADERBOARD */
+#lbScreen{gap:16px;justify-content:flex-start;padding-top:28px}
+.lb-wrap{width:100%;max-width:660px}
+.lb-hdr{text-align:center;margin-bottom:20px}
+.lb-hdr h1{font-size:26px;color:var(--gold);text-shadow:0 0 30px rgba(201,168,76,.5);margin-bottom:4px}
+.tab-row{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.tab{padding:6px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.12);background:transparent;font-family:inherit;font-size:12px;color:var(--dim);cursor:pointer;transition:all .18s}
+.tab.active{background:rgba(201,168,76,.18);border-color:var(--gold);color:var(--gold)}
+.lb-table{width:100%;border-collapse:separate;border-spacing:0 5px}
+.lb-table thead th{font-size:10px;color:var(--dim);letter-spacing:1.5px;padding:6px 14px;text-align:left;border-bottom:1px solid rgba(201,168,76,.18)}
+.lb-row td{padding:12px 14px;background:linear-gradient(145deg,rgba(26,22,48,.9),rgba(14,12,26,.95));border:1px solid rgba(255,255,255,.04);transition:all .18s;font-size:13px}
+.lb-row:hover td{background:rgba(40,34,70,.9);border-color:rgba(201,168,76,.18)}
+.lb-row td:first-child{border-radius:8px 0 0 8px}
+.lb-row td:last-child{border-radius:0 8px 8px 0}
+.lb-rank{font-size:18px;text-align:center;width:44px}
+.r1{color:#ffd700}.r2{color:#c0c0c0}.r3{color:#cd7f32}
+.lb-name{font-weight:700}
+.lb-cls{font-size:11px;color:var(--dim);margin-top:2px}
+.lb-time{color:var(--gold);font-weight:900;font-variant-numeric:tabular-nums;text-align:right}
+.lb-empty{text-align:center;padding:44px 20px;color:var(--dim);font-size:15px}
+
+/* OVERLAYS */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(5px)}
+.overlay.on{display:flex}
+.modal{background:linear-gradient(145deg,rgba(26,22,48,.99),rgba(10,8,20,1));border:1px solid rgba(201,168,76,.32);border-radius:var(--radius);padding:26px 28px;width:100%;max-width:520px;position:relative;animation:fdIn .3s;max-height:90vh;overflow-y:auto}
+.modal h2{color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:8px;font-size:17px}
+.modal-x{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--dim);font-size:20px;cursor:pointer}
+.modal-x:hover{color:var(--text)}
+.code-block{background:#06040e;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:12px;font-family:monospace;font-size:11px;color:#98e090;overflow:auto;white-space:pre;margin:10px 0;max-height:180px;line-height:1.6}
+.tip{font-size:13px;color:var(--dim);line-height:1.85}
+.tip strong{color:var(--text)}
+
+/* ═══════════════════════════════
+   ADMIN PANEL
+═══════════════════════════════ */
+#adminScreen{justify-content:flex-start;padding:0;align-items:stretch}
+.adm-layout{display:flex;min-height:100vh;width:100%}
+.adm-sidebar{width:210px;flex-shrink:0;background:rgba(8,6,15,.98);border-right:1px solid rgba(201,168,76,.14);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+.adm-logo{padding:18px 16px 12px;border-bottom:1px solid rgba(201,168,76,.12);font-size:13px;font-weight:900;color:var(--gold);letter-spacing:1px}
+.adm-logo small{display:block;font-size:10px;color:var(--dim);font-weight:400;margin-top:2px;letter-spacing:0}
+.adm-nav{flex:1;padding:8px 0}
+.adm-nav-item{display:flex;align-items:center;gap:10px;padding:11px 18px;font-size:13px;color:var(--dim);cursor:pointer;transition:all .15s;border:none;background:transparent;width:100%;font-family:inherit;text-align:left;border-left:2px solid transparent}
+.adm-nav-item:hover{background:rgba(255,255,255,.04);color:var(--text)}
+.adm-nav-item.active{background:rgba(201,168,76,.09);color:var(--gold);border-left-color:var(--gold)}
+.adm-nav-section{font-size:10px;color:var(--dim);letter-spacing:2px;padding:14px 18px 4px;opacity:.55}
+.adm-exit{padding:14px 18px;border-top:1px solid rgba(255,255,255,.06);font-size:12px;color:var(--dim);cursor:pointer;display:flex;align-items:center;gap:8px;border:none;background:transparent;font-family:inherit;width:100%;transition:color .15s}
+.adm-exit:hover{color:#e87070}
+.adm-main{flex:1;padding:28px 30px;overflow-y:auto;min-width:0}
+.adm-title{font-size:20px;font-weight:900;color:var(--gold);margin-bottom:4px}
+.adm-subtitle{font-size:13px;color:var(--dim);margin-bottom:22px}
+.adm-panel{background:rgba(26,22,48,.75);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:18px 20px;margin-bottom:16px}
+.adm-panel-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.adm-panel-hdr h3{font-size:14px;color:var(--text);font-weight:700}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:16px}
+.stat-card{background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:14px;text-align:center}
+.stat-num{font-size:26px;font-weight:900;color:var(--gold)}
+.stat-lbl{font-size:11px;color:var(--dim);margin-top:4px}
+/* room list */
+.room-list{display:grid;gap:7px}
+.room-item{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.06);border-radius:8px;cursor:pointer;transition:all .18s;gap:10px;flex-wrap:wrap}
+.room-item:hover{border-color:rgba(201,168,76,.32);background:rgba(201,168,76,.06)}
+.room-item.selected{border-color:var(--gold);background:rgba(201,168,76,.09)}
+.room-item-left{display:flex;align-items:center;gap:10px}
+.room-item-emoji{font-size:22px}
+.room-item-name{font-size:13px;font-weight:700}
+.room-item-meta{font-size:11px;color:var(--dim);margin-top:1px}
+.room-item-right{display:flex;gap:5px;align-items:center}
+/* question editor */
+#admQEditor{display:none}
+.q-editor-header{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.07);flex-wrap:wrap}
+.q-editor-header .back-btn{font-size:20px;cursor:pointer;color:var(--dim);transition:color .15s;background:none;border:none;padding:0}
+.q-editor-header .back-btn:hover{color:var(--gold)}
+.q-editor-room{font-size:17px;font-weight:900;color:var(--gold)}
+.q-editor-meta{font-size:12px;color:var(--dim)}
+.save-indicator{font-size:11px;color:var(--dim);display:flex;align-items:center;gap:4px;margin-left:auto}
+.save-indicator.saved{color:#5dde94}
+.save-indicator.unsaved{color:#e8c84c}
+.q-card{background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:16px 18px;margin-bottom:10px;transition:border-color .2s}
+.q-card:hover{border-color:rgba(201,168,76,.22)}
+.q-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:6px}
+.q-num-badge{background:rgba(201,168,76,.16);color:var(--gold);padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700}
+.q-card-actions{display:flex;gap:5px}
+.answer-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
+.answer-opt{display:flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid rgba(255,255,255,.1);border-radius:7px;cursor:pointer;transition:all .15s;background:rgba(0,0,0,.2)}
+.answer-opt:hover{border-color:rgba(201,168,76,.28)}
+.answer-opt.correct-ans{border-color:#27ae60;background:rgba(39,174,96,.1)}
+.answer-opt input[type=radio]{accent-color:var(--gold);width:14px;height:14px;flex-shrink:0}
+.answer-opt-label{font-size:12px;color:var(--dim);font-weight:700;flex-shrink:0}
+.answer-opt input[type=text]{border:none;background:transparent;padding:0;font-size:13px;box-shadow:none}
+.add-q-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border:2px dashed rgba(201,168,76,.22);border-radius:10px;background:transparent;color:var(--dim);font-family:inherit;font-size:13px;cursor:pointer;transition:all .18s}
+.add-q-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.05)}
+.meta-row{display:grid;grid-template-columns:72px 1fr;gap:8px;align-items:start;margin-bottom:10px}
+.meta-row label{font-size:12px;color:var(--dim);padding-top:11px}
+.emoji-picker-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.ep-btn{font-size:18px;width:34px;height:34px;border-radius:7px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.ep-btn:hover{border-color:var(--gold);background:rgba(201,168,76,.1)}
+.ep-btn.sel{border-color:var(--gold);background:rgba(201,168,76,.18)}
+.pw-err{display:none;color:#e87070;font-size:12px;text-align:center;margin-top:8px;animation:fdIn .3s}
+.pw-err.on{display:block}
+@media(max-width:640px){
+  .adm-sidebar{width:100%;height:auto;flex-direction:row;flex-wrap:nowrap;overflow-x:auto;position:relative}
+  .adm-nav{display:flex;flex-direction:row;padding:4px;gap:2px;overflow-x:auto}
+  .adm-nav-item{white-space:nowrap;border-left:none!important;border-bottom:2px solid transparent;padding:8px 10px}
+  .adm-nav-item.active{border-bottom-color:var(--gold);background:rgba(201,168,76,.08)}
+  .adm-layout{flex-direction:column}
+  .adm-main{padding:14px}
+  .adm-logo,.adm-nav-section,.adm-exit{display:none}
+  .answer-grid{grid-template-columns:1fr}
+}
+
+/* improve tag */
+.improve-tag{
+  display:flex;align-items:center;justify-content:center;
+  gap:8px;padding:10px 20px;border-radius:10px;
+  font-size:14px;font-weight:700;text-align:center;
+  animation:fdIn .4s;max-width:440px;width:100%
+}
+.improve-tag.new{background:rgba(123,82,208,.18);border:1px solid rgba(123,82,208,.45);color:#c5a8e8}
+.improve-tag.better{background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.5);color:var(--gold)}
+.improve-tag.same{background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.1);color:var(--dim)}
+</style>
+</head>
+<body>
+<div id="stars"></div>
+<div id="toast"></div>
+
+<!-- PASSWORD MODAL -->
+<div class="overlay" id="pwModal">
+  <div class="modal" style="max-width:360px">
+    <div style="font-size:52px;text-align:center;margin-bottom:10px;animation:flt 3s ease-in-out infinite">🔐</div>
+    <div style="text-align:center;color:var(--gold);font-size:18px;font-weight:900;margin-bottom:4px">管理員登入</div>
+    <div style="text-align:center;color:var(--dim);font-size:12px;margin-bottom:18px">輸入密碼才能進入後台</div>
+    <div class="ig"><label>管理員密碼</label><input type="password" id="pwInput" placeholder="輸入密碼…" onkeydown="if(event.key==='Enter')checkPw()"></div>
+    <div class="pw-err" id="pwError">❌ 密碼錯誤，請再試一次</div>
+    <div class="btn-row"><button class="btn btn-ghost" onclick="closePwModal()">取消</button><button class="btn btn-gold" onclick="checkPw()">🔓 登入</button></div>
+  </div>
+</div>
+
+<!-- GAS MODAL -->
+<div class="overlay" id="gasModal">
+  <div class="modal">
+    <button class="modal-x" onclick="closeGas()">✕</button>
+    <h2>⚙️ 後端設定</h2>
+    <div class="tip"><strong>步驟一：</strong>建立 Google Apps Script，貼入以下程式碼</div>
+    <div class="code-block" id="gasCode">const SHEET_ID = 'YOUR_GOOGLE_SHEET_ID';
+const SHEET = '排行榜';
+// 欄位：A時間戳記 B姓名 C班級 D秒數 E提示次數 F勳章等級 G勳章 H挑戰次數
+
+function doPost(e) {
+  const lock = LockService.getScriptLock();
+  lock.tryLock(5000);
+  try {
+    const d = JSON.parse(e.postData.contents);
+    const ss = SpreadsheetApp.openById(SHEET_ID);
+    let sh = ss.getSheetByName(SHEET);
+    if (!sh) {
+      sh = ss.insertSheet(SHEET);
+      sh.appendRow(['時間戳記','姓名','班級',
+        '完成時間(秒)','提示次數','勳章等級','勳章','挑戰次數']);
+      sh.getRange(1,1,1,8).setFontWeight('bold').setBackground('#f3e8c0');
+    }
+
+    const key = d.name + '||' + d.cls;
+    const allRows = sh.getDataRange().getValues();
+    let existRow = -1;
+    for (let i = 1; i < allRows.length; i++) {
+      if (allRows[i][1] + '||' + allRows[i][2] === key) {
+        existRow = i + 1;
+        break;
+      }
+    }
+
+    const now = new Date().toLocaleString('zh-TW');
+    const isBetter = (nM,nS,nH,oM,oS,oH) => {
+      if (nM !== oM) return nM < oM;
+      if (nS !== oS) return nS < oS;
+      return nH < oH;
+    };
+
+    if (existRow === -1) {
+      sh.appendRow([now,d.name,d.cls,d.seconds,
+        d.hints,d.medalLevel,d.medal,1]);
+      return out({success:true,improved:true,isNew:true});
+    } else {
+      const old = allRows[existRow - 1];
+      const playCount = (Number(old[7])||1) + 1;
+      const improved = isBetter(
+        d.medalLevel,d.seconds,d.hints,
+        Number(old[5]),Number(old[3]),Number(old[4])
+      );
+      if (improved) {
+        sh.getRange(existRow,1,1,8).setValues([[
+          now,d.name,d.cls,d.seconds,
+          d.hints,d.medalLevel,d.medal,playCount
+        ]]);
+      } else {
+        sh.getRange(existRow,8).setValue(playCount);
+      }
+      return out({success:true,improved,isNew:false,playCount});
+    }
+  } catch(err) {
+    return out({success:false,error:err.message});
+  } finally { lock.releaseLock(); }
+}
+
+function doGet(e) {
+  if (e.parameter.action !== 'lb') return out([]);
+  const ss = SpreadsheetApp.openById(SHEET_ID);
+  const sh = ss.getSheetByName(SHEET);
+  if (!sh) return out([]);
+  const rows = sh.getDataRange().getValues().slice(1)
+    .filter(r => r[0])
+    .map(r => ({
+      name:r[1],cls:r[2],seconds:+r[3],
+      hints:+r[4],medalLevel:+r[5],medal:r[6],
+      playCount:+r[7]||1
+    }));
+  return out(rows);
+}
+function out(data){
+  return ContentService.createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON);
+}</div>
+    <div class="tip" style="margin-top:10px"><strong>步驟二：</strong>部署 Web App（執行者：我、存取：所有人）<br><strong>步驟三：</strong>複製部署網址貼入下方</div>
+    <div class="ig" style="margin-top:12px"><label>GAS Web App 網址</label><input type="url" id="gasIn" placeholder="https://script.google.com/macros/s/AKfycbzr7vor8mLzTnP4UuSwUP5QXvk7Aa_x-1PcXrZg5Vj71XBkntcdwD7eXf-aic87FCY/exec"></div>
+    <div class="btn-row"><button class="btn btn-ghost btn-sm" onclick="copyGas()">📋 複製程式碼</button><button class="btn btn-gold" onclick="saveGas()">✅ 儲存</button></div>
+  </div>
+</div>
+
+<!-- TITLE -->
+<div class="screen active z" id="titleScreen">
+  <div class="title-emoji">📚</div>
+  <div class="title-glow cinzel">閱讀密室逃脫</div>
+  <div class="title-sub">READING ESCAPE ROOM</div>
+  <div class="title-desc">🔐 你被困在神秘的圖書館迷宮中<br>闖過 <strong style="color:var(--gold)" id="titleRoomCount">12 個密室</strong>，解開每道閱讀謎題才能重獲自由！<br>🏅 完成後依勳章等級登上榮譽排行榜</div>
+  <div class="btn-row">
+    <button class="btn btn-gold" onclick="go('registerScreen')">🚀 開始挑戰</button>
+    <button class="btn btn-purple" onclick="showLb()">🏆 榮譽排行榜</button>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-ghost btn-sm" onclick="openGas()">⚙️ 後端設定</button>
+    <button class="btn btn-ghost btn-sm" onclick="openPwModal()">🛠️ 管理員後台</button>
+  </div>
+</div>
+
+<!-- REGISTER -->
+<div class="screen z" id="registerScreen">
+  <div class="card">
+    <h2 class="gold" style="font-size:18px;margin-bottom:18px">🗝️ 進入密室前…</h2>
+    <div class="ig"><label>姓名</label><input id="pName" placeholder="請輸入姓名" maxlength="10"></div>
+    <div class="ig"><label>班級</label>
+      <select id="pCls">
+        <option value="">── 選擇班級 ──</option>
+        <option>一年1班</option><option>一年2班</option><option>一年3班</option><option>一年4班</option><option>一年5班</option><option>一年6班</option><option>一年7班</option><option>一年8班</option>
+        <option>二年1班</option><option>二年2班</option><option>二年3班</option><option>二年4班</option><option>二年5班</option><option>二年6班</option><option>二年7班</option><option>二年8班</option>
+        <option>三年1班</option><option>三年2班</option><option>三年3班</option><option>三年4班</option><option>三年5班</option><option>三年6班</option><option>三年7班</option><option>三年8班</option>
+        <option>四年1班</option><option>四年2班</option><option>四年3班</option><option>四年4班</option><option>四年5班</option><option>四年6班</option><option>四年7班</option><option>四年8班</option>
+        <option>五年1班</option><option>五年2班</option><option>五年3班</option><option>五年4班</option><option>五年5班</option><option>五年6班</option><option>五年7班</option><option>五年8班</option>
+        <option>六年1班</option><option>六年2班</option><option>六年3班</option><option>六年4班</option><option>六年5班</option><option>六年6班</option><option>六年7班</option><option>六年8班</option>
+      </select>
+    </div>
+    <div class="tip" style="margin-bottom:16px">💡 共 <strong style="color:var(--gold)" id="regRoomCount">12 關</strong>，每關 3 題，計時從開始起算<br>⚔️ 勳章等級：💎鑽石 › 🥇黃金 › 🥈白銀 › 🥉青銅</div>
+    <button class="btn btn-gold btn-full" onclick="startGame()">🔐 解鎖密室！</button>
+    <div style="margin-top:10px;text-align:center"><button class="btn btn-ghost btn-sm" onclick="go('titleScreen')">← 返回</button></div>
+  </div>
+</div>
+
+<!-- GAME -->
+<div class="screen z" id="gameScreen">
+  <div class="g-header">
+    <div class="g-player"><div class="g-avatar" id="gAvatar">📖</div><div><div class="g-name" id="gName">玩家</div><div class="g-cls" id="gCls">班級</div></div></div>
+    <div class="stage-pill" id="gPill">第 1 關</div>
+    <div class="g-timer" id="gTimer">00:00</div>
+  </div>
+  <div class="g-body">
+    <div class="prog-wrap"><div class="prog-lbl"><span id="progLbl">進度</span><span id="progPct">0%</span></div><div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div></div>
+    <div class="room-card" id="roomCard">
+      <div class="room-icon" id="rIcon">🏛️</div>
+      <div class="room-name" id="rName">密室</div>
+      <div class="room-story" id="rStory">…</div>
+      <div class="q-box" id="qBox">
+        <div class="q-meta" id="qMeta">問題 1/3</div>
+        <div class="q-text" id="qText">…</div>
+        <div class="choices" id="qChoices"></div>
+        <div class="fb" id="fb"></div>
+        <div class="hint-row"><div class="hint-lbl" id="hLbl">💡 提示：1 次</div><button class="btn btn-ghost btn-sm" id="hBtn" onclick="useHint()">使用提示</button></div>
+        <div class="hint-box" id="hBox"></div>
+      </div>
+      <div class="sc" id="sc">
+        <div class="sc-emoji" id="scEmoji">🔓</div>
+        <div class="sc-title" id="scTitle">密室解鎖！</div>
+        <div class="sc-msg" id="scMsg">你找到了線索！</div>
+        <button class="btn btn-gold" id="scBtn" onclick="nextStage()">🚪 下一關</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div class="screen z" id="resultScreen">
+  <div class="res-trophy" id="resTrophy">🏆</div>
+  <div class="cinzel" style="font-size:26px;color:var(--gold);text-shadow:0 0 40px rgba(201,168,76,.6)">逃脫成功！</div>
+  <div class="res-card">
+    <div class="r-stat"><span class="lbl">👤 姓名</span><span class="val" id="rName2">—</span></div>
+    <div class="r-stat"><span class="lbl">🏫 班級</span><span class="val" id="rCls">—</span></div>
+    <div class="r-stat"><span class="lbl">⏱️ 完成時間</span><span class="val" id="rTime">—</span></div>
+    <div class="r-stat"><span class="lbl">💡 使用提示</span><span class="val" id="rHints">—</span></div>
+    <div class="r-stat"><span class="lbl">🏅 獲得勳章</span><span class="val" id="rMedal">—</span></div>
+  </div>
+  <div id="subStatus" style="font-size:13px;color:var(--dim)">正在提交成績…</div>
+  <div id="improveMsg" class="improve-tag" style="display:none"></div>
+  <div class="btn-row"><button class="btn btn-purple" onclick="showLb()">🏆 查看排行榜</button><button class="btn btn-ghost" onclick="restartGame()">🔁 再挑戰</button></div>
+</div>
+
+<!-- LEADERBOARD -->
+<div class="screen z" id="lbScreen">
+  <div class="lb-wrap">
+    <div class="lb-hdr"><h1 class="cinzel">🏆 榮譽勳章排行榜</h1><p style="color:var(--dim);font-size:13px">依勳章等級排名 · 同等級內以完成時間決勝</p></div>
+    <div class="tab-row" id="tabRow">
+      <button class="tab active" onclick="setTab('全部')">全部</button>
+      <button class="tab" onclick="setTab('💎')">💎 鑽石</button>
+      <button class="tab" onclick="setTab('🥇')">🥇 黃金</button>
+      <button class="tab" onclick="setTab('🥈')">🥈 白銀</button>
+      <button class="tab" onclick="setTab('🥉')">🥉 青銅</button>
+    </div>
+    <div id="lbContent"><div class="lb-empty">⏳ 載入中…</div></div>
+    <div class="btn-row" style="margin-top:16px"><button class="btn btn-ghost btn-sm" onclick="loadLb()">🔄 重新整理</button><button class="btn btn-ghost" onclick="go('titleScreen')">← 返回主頁</button></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     ADMIN SCREEN
+═══════════════════════════════════════ -->
+<div class="screen" id="adminScreen">
+  <div class="adm-layout">
+    <div class="adm-sidebar">
+      <div class="adm-logo">🛠️ 管理後台<small>閱讀密室逃脫</small></div>
+      <nav class="adm-nav">
+        <div class="adm-nav-section">內容管理</div>
+        <button class="adm-nav-item active" id="navRooms" onclick="admNav('rooms')">📚 關卡題目管理</button>
+        <div class="adm-nav-section">系統</div>
+        <button class="adm-nav-item" id="navSettings" onclick="admNav('settings')">⚙️ 系統設定</button>
+        <button class="adm-nav-item" id="navPw" onclick="admNav('pw')">🔑 修改密碼</button>
+      </nav>
+      <button class="adm-exit" onclick="admLogout()">🚪 退出後台</button>
+    </div>
+    <div class="adm-main" id="admMain">
+
+      <!-- ROOMS -->
+      <div id="admRooms">
+        <div class="adm-title">📚 關卡題目管理</div>
+        <div class="adm-subtitle">點選關卡編輯密室與題目，可拖曳調整順序</div>
+        <div class="stats-grid" id="admStats"></div>
+        <div class="adm-panel">
+          <div class="adm-panel-hdr"><h3>🏛️ 所有關卡</h3><button class="btn btn-gold btn-sm" onclick="addRoom()">＋ 新增關卡</button></div>
+          <div class="room-list" id="admRoomList"></div>
+        </div>
+        <!-- Question Editor -->
+        <div id="admQEditor">
+          <div class="q-editor-header">
+            <button class="back-btn" onclick="closeQEditor()">←</button>
+            <div><div class="q-editor-room" id="qEdRoomName">密室名稱</div><div class="q-editor-meta" id="qEdRoomMeta">0 題</div></div>
+            <span class="save-indicator saved" id="saveIndicator">● 已儲存</span>
+          </div>
+          <!-- Room Meta -->
+          <div class="adm-panel">
+            <div class="adm-panel-hdr"><h3>🏛️ 密室基本資訊</h3></div>
+            <div class="meta-row"><label>圖示</label>
+              <div><div style="font-size:26px;margin-bottom:6px" id="metaEmojiDisplay">📚</div><div class="emoji-picker-row" id="emojiPicker"></div></div>
+            </div>
+            <div class="meta-row"><label>名稱</label><input id="metaName" placeholder="密室名稱" oninput="metaChanged()"></div>
+            <div class="meta-row"><label>故事</label><textarea id="metaStory" rows="3" placeholder="密室故事描述…" oninput="metaChanged()"></textarea></div>
+            <div class="meta-row"><label>解鎖線索</label><input id="metaClue" placeholder="完成本關後顯示的線索文字" oninput="metaChanged()"></div>
+            <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px;flex-wrap:wrap">
+              <button class="btn btn-danger btn-sm" onclick="deleteRoom()">🗑️ 刪除此關卡</button>
+              <button class="btn btn-gold btn-sm" onclick="saveMeta()">💾 儲存密室資訊</button>
+            </div>
+          </div>
+          <!-- Questions -->
+          <div class="adm-panel">
+            <div class="adm-panel-hdr"><h3>❓ 題目列表</h3><span style="font-size:12px;color:var(--dim)" id="qCountLabel">0 題</span></div>
+            <div id="qList"></div>
+            <button class="add-q-btn" onclick="addQuestion()">＋ 新增題目</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div id="admSettings" style="display:none">
+        <div class="adm-title">⚙️ 系統設定</div>
+        <div class="adm-subtitle">GAS 後端連結與勳章條件設定</div>
+        <div class="adm-panel">
+          <div class="adm-panel-hdr"><h3>🔗 GAS 後端網址</h3></div>
+          <div class="ig"><label>Web App 網址</label><input type="url" id="admGasIn" placeholder="https://script.google.com/macros/s/AKfycbzr7vor8mLzTnP4UuSwUP5QXvk7Aa_x-1PcXrZg5Vj71XBkntcdwD7eXf-aic87FCY/exec"></div>
+          <div class="btn-row" style="justify-content:flex-start"><button class="btn btn-ghost btn-sm" onclick="openGas()">📋 查看 GAS 程式碼</button><button class="btn btn-gold btn-sm" onclick="admSaveGas()">💾 儲存網址</button></div>
+        </div>
+        <div class="adm-panel">
+          <div class="adm-panel-hdr"><h3>🏅 勳章條件設定</h3></div>
+          <div style="display:grid;gap:10px">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:end">
+              <div class="ig" style="margin:0;flex:1;min-width:120px"><label>💎 鑽石 — 最長秒數</label><input type="number" id="mDiaSec" min="30"></div>
+              <div class="ig" style="margin:0;flex:1;min-width:120px"><label>最多提示次數</label><input type="number" id="mDiaHints" min="0"></div>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:end">
+              <div class="ig" style="margin:0;flex:1;min-width:120px"><label>🥇 黃金 — 最長秒數</label><input type="number" id="mGoldSec" min="60"></div>
+              <div class="ig" style="margin:0;flex:1;min-width:120px"><label>最多提示次數</label><input type="number" id="mGoldHints" min="0"></div>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:end">
+              <div class="ig" style="margin:0;flex:1;min-width:120px"><label>🥈 白銀 — 最長秒數</label><input type="number" id="mSilSec" min="60"></div>
+              <div class="ig" style="margin:0;flex:1;min-width:120px"><label style="color:rgba(138,127,96,.5)">提示次數</label><input disabled value="不限" style="opacity:.35"></div>
+            </div>
+            <div style="font-size:12px;color:var(--dim)">🥉 青銅：超過白銀條件者自動獲得</div>
+          </div>
+          <div class="btn-row" style="justify-content:flex-start;margin-top:12px"><button class="btn btn-gold btn-sm" onclick="saveMedalSettings()">💾 儲存勳章設定</button></div>
+        </div>
+      </div>
+
+      <!-- PASSWORD -->
+      <div id="admPw" style="display:none">
+        <div class="adm-title">🔑 修改密碼</div>
+        <div class="adm-subtitle">修改管理員登入密碼</div>
+        <div class="adm-panel" style="max-width:380px">
+          <div class="ig"><label>目前密碼</label><input type="password" id="oldPw" placeholder="輸入目前密碼"></div>
+          <div class="ig"><label>新密碼</label><input type="password" id="newPw" placeholder="輸入新密碼（至少 4 字元）"></div>
+          <div class="ig"><label>確認新密碼</label><input type="password" id="confirmPw" placeholder="再次輸入新密碼"></div>
+          <div class="pw-err" id="pwChangeError"></div>
+          <div class="btn-row" style="justify-content:flex-start;margin-top:4px"><button class="btn btn-gold btn-sm" onclick="changePw()">🔑 更新密碼</button></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════ CONFIG ═══════════════
+let GAS_URL = localStorage.getItem('gasUrl')||'https://script.google.com/macros/s/AKfycbzr7vor8mLzTnP4UuSwUP5QXvk7Aa_x-1PcXrZg5Vj71XBkntcdwD7eXf-aic87FCY/exec';
+let ADMIN_PW = localStorage.getItem('adminPw')||'admin1234';
+const EMOJIS=['📜','🔮','🗝️','🏺','🌿','🌊','🔬','🎭','🗺️','🎨','⚗️','🌟','📖','🏛️','🔭','🧬','🎯','🌙','⚔️','🦋','🌈','🔥','💡','🧩','🎪','🏰','🌺','🦉'];
+
+function loadRooms(){const s=localStorage.getItem('escapeRooms');if(s)try{return JSON.parse(s)}catch(e){}return defaultRooms()}
+function saveRooms(){localStorage.setItem('escapeRooms',JSON.stringify(ROOMS))}
+function loadMedals(){const s=localStorage.getItem('medalCfg');if(s)try{return JSON.parse(s)}catch(e){}return defaultMedals()}
+function defaultMedals(){return[{id:'💎',label:'鑽石',order:0,maxSec:180,maxHints:0},{id:'🥇',label:'黃金',order:1,maxSec:300,maxHints:3},{id:'🥈',label:'白銀',order:2,maxSec:480,maxHints:99},{id:'🥉',label:'青銅',order:3,maxSec:99999,maxHints:99}]}
+
+let ROOMS=loadRooms();
+let MEDALS=loadMedals();
+function getMedal(sec,hints){for(const m of MEDALS)if(sec<=m.maxSec&&hints<=m.maxHints)return m;return MEDALS[MEDALS.length-1]}
+
+function defaultRooms(){return[
+
+// ══ 關 1：古老圖書館 ══ 舊題×2 + 連續文本×1 + 非連續文本×1
+{emoji:'📜',name:'古老圖書館',
+story:'塵封的書架散發神秘光芒，鑄鐵大鎖鎖住了出路。解開這三道閱讀之謎，才能打開第一扇門…',
+clue:'書架後方的暗格打開了，你找到了一把古老的鑰匙！',qs:[
+  {q:'「閱讀」最主要的目的是什麼？',ch:['消磨時間','獲取知識與樂趣','讓眼睛疲勞','只是習慣'],a:1,h:'閱讀能學習新知，也帶來故事的樂趣。'},
+  // 【連續文本】段落理解
+  {q:'📖【連續文本】請讀以下短文後作答：\n\n「小明每天放學後都會到圖書館，挑一本他從未讀過的書。他說：『每本書都是一扇窗，可以看見不同的世界。』」\n\n根據文章，小明認為讀書的意義是什麼？',
+   ch:['可以消磨放學後的時間','能夠看見不同的世界與觀點','可以交到更多朋友','能讓自己變得更聰明'],a:1,
+   h:'小明的比喻「書是一扇窗」說明書能開展視野，看見不同的世界。'},
+  // 【非連續文本】圖書館公告
+  {q:'📋【非連續文本】請看以下圖書館公告：\n\n╔ 興嘉圖書館借閱規定 ╗\n● 每人每次最多借 5 本\n● 借閱期限：14 天\n● 逾期每天罰款 2 元\n● 週一公休，週二至週日 8:00–20:00\n\n小華借了 3 本書，今天是還書期限最後一天，但圖書館今天公休。她最晚可以哪天還書不用罰款？',
+   ch:['今天之前還清','明天（週二）還書即可','後天（週三）還書','下週一才要罰款'],a:1,
+   h:'週一公休不計入逾期，週二恢復開放時再還即可，不會有罰款。'}
+]},
+
+// ══ 關 2：星象預言室 ══ 舊題×1 + 連續文本×1 + 非連續文本×1 + 混合文本×1
+{emoji:'🔮',name:'星象預言室',
+story:'佈滿星圖的圓頂房間，水晶球中浮現文本的謎題。集中精神，方能繼續前進…',
+clue:'水晶球發出耀眼光芒，第三道門的密碼顯現！',qs:[
+  {q:'「預測」這個閱讀策略是指？',ch:['只讀第一段','根據線索猜測接下來的內容','把文章背起來','畫出文章的圖'],a:1,h:'好讀者在閱讀前和中，都會根據線索猜想內容。'},
+  // 【連續文本】推論
+  {q:'📖【連續文本】請讀以下短文後作答：\n\n「連續三天，教室的窗台上都出現一束小野花。沒有人知道是誰放的，但班上最安靜的女生阿珍，每天早上都是第一個進教室的人。」\n\n根據文章，作者暗示野花最可能是誰放的？',
+   ch:['班長','清潔阿姨','阿珍','導師'],a:2,
+   h:'文章沒有直說，但「最安靜的女生阿珍每天最早進教室」是重要線索，需要用推論策略。'},
+  // 【非連續文本】圖表
+  {q:'📊【非連續文本】請看以下班級閱讀統計表：\n\n班級讀書心得繳交數量\n一月：15 份　二月：8 份\n三月：22 份　四月：30 份\n\n根據表格，哪個月份的繳交數量比上個月「減少」了？',
+   ch:['一月','二月','三月','四月'],a:1,
+   h:'二月（8份）比一月（15份）少，是唯一減少的月份。'},
+  // 【混合文本】文字＋表格合讀
+  {q:'📑【混合文本】請閱讀以下文字與表格：\n\n文字：「本學期閱讀馬拉松活動，各班以人均閱讀冊數評比，第一名班級可獲得書券獎勵。」\n\n表格（人均冊數）：\n甲班 6.2　乙班 7.8　丙班 7.1　丁班 5.9\n\n根據文字與表格，哪個班級最可能獲得書券獎勵？',
+   ch:['甲班','乙班','丙班','丁班'],a:1,
+   h:'乙班人均 7.8 冊為最高，對照規則「人均最多」即為第一名。'}
+]},
+
+// ══ 關 3：鑄鐵密鑰室 ══ 舊題×2 + 連續文本×2
+{emoji:'🗝️',name:'鑄鐵密鑰室',
+story:'牆上刻滿文學符號，三把鑄鐵鎖扣住大門。答對這些題，第三道門將為你開啟…',
+clue:'鑄鐵鎖碎裂！你找到了通往第四間密室的密道！',qs:[
+  {q:'「明喻」的特點是？',ch:['省略比較詞','使用「像、如、彷彿」等比較詞','把事物擬人化','誇大描寫'],a:1,h:'有「像、如、好像、彷彿」等比較詞的是明喻。'},
+  {q:'「書山有路勤為徑」的含義是？',ch:['讀書要花很多錢','勤奮努力是學習的關鍵','學習很輕鬆','不需要讀書'],a:1,h:'這是一句鼓勵人勤奮學習的名言。'},
+  // 【連續文本】找主旨
+  {q:'📖【連續文本】請讀以下短文後作答：\n\n「蜜蜂每天從花朵採集花蜜，要釀出一公斤的蜂蜜，需要飛行四萬公里以上，相當於繞地球一圈。牠們從不因路途遙遠而放棄。」\n\n這段文章的主旨最可能是什麼？',
+   ch:['蜜蜂喜歡喝蜂蜜','蜂蜜的製作很複雜','持之以恆的努力終能成就偉大的事','蜜蜂比其他昆蟲更勤勞'],a:2,
+   h:'文章透過蜜蜂的努力，傳遞「持續努力能成就偉大」的核心訊息。'},
+  // 【連續文本】細節理解
+  {q:'📖【連續文本】請讀以下短文後作答：\n\n「台灣四面環海，擁有豐富的海洋資源。然而過度捕撈使魚類數量急遽下降。科學家指出，若不立即採取保育措施，部分魚種可能在二十年內消失。」\n\n根據文章，科學家提出什麼警告？',
+   ch:['台灣的漁業收入將會減少','部分魚種可能在二十年內消失','海水溫度正在升高','漁民的生活將更加艱難'],a:1,
+   h:'文章明確說明「科學家指出，部分魚種可能在二十年內消失」。'}
+]},
+
+// ══ 關 4：古文物陳列室 ══ 舊題×1 + 非連續文本×2 + 混合文本×1
+{emoji:'🏺',name:'古文物陳列室',
+story:'玻璃展示櫃中放著古老的文物，每件文物旁都有謎語標籤。只有博學之人才能通過…',
+clue:'展示櫃底部的抽屜彈開，裡面有一張地圖！',qs:[
+  {q:'「擬人」修辭法是指？',ch:['把人比喻成動物','把非人的事物賦予人的特徵','誇大描述','省略主詞'],a:1,h:'擬人是把無生命或非人的事物，寫成具有人的動作或感情。'},
+  // 【非連續文本】時刻表
+  {q:'🚌【非連續文本】請看以下公車時刻表：\n\n興嘉站發車時間\n平日：07:00、08:30、10:00、13:00、16:30、18:00\n假日：09:00、12:00、15:00、18:00\n\n小明星期六想在下午兩點前到達目的地（車程 30 分鐘），他最晚應搭哪班車？',
+   ch:['09:00 那班','12:00 那班','15:00 那班','18:00 那班'],a:1,
+   h:'12:00 出發，加 30 分鐘車程，12:30 抵達，在下午兩點前，是最晚可搭的班次。'},
+  // 【非連續文本】廣告傳單
+  {q:'📣【非連續文本】請看以下活動廣告：\n\n★ 暑假閱讀營 ★\n時間：7/1–7/5，每天 09:00–12:00\n對象：國小三至六年級\n費用：會員 500 元，非會員 800 元\n報名截止：6/20\n備註：每梯次限額 20 人，額滿為止\n\n以下哪個說法符合廣告內容？',
+   ch:['活動為期一週','會員費用比非會員貴','六年級學生可以報名','報名截止日在活動結束後'],a:2,
+   h:'廣告說明對象為「國小三至六年級」，六年級學生確實可以報名。'},
+  // 【混合文本】廣告文字＋規則合讀
+  {q:'📑【混合文本】請閱讀以下文字與說明：\n\n文字：「阿志是五年級學生，他在 6/18 看到閱讀營廣告，馬上想報名。」\n\n廣告規定：報名截止 6/20，限額 20 人，額滿為止。\n\n根據以上資訊，阿志能否報名成功？',
+   ch:['一定可以，因為還在截止日前','不一定，還要看名額是否已滿','不行，因為他是五年級','不行，因為他看到廣告太晚了'],a:1,
+   h:'截止日 6/20 尚未到期，但廣告明確說明「額滿為止」，所以不一定能報名成功。'}
+]},
+
+// ══ 關 5：植物標本室 ══ 舊題×2 + 連續文本×1 + 非連續文本×1
+{emoji:'🌿',name:'植物標本室',
+story:'乾燥的花草標本貼滿四壁，瓶瓶罐罐散發著淡淡書香。窗上的密碼鎖在等你解開…',
+clue:'窗鎖彈開了，清新的空氣湧入！第五間密室的入口在窗外！',qs:[
+  {q:'「論說文」和「記敘文」最大的差別是？',ch:['字數長短','是否提出論點並加以說明','使用的字詞','文章格式'],a:1,h:'論說文以提出主張並論證為主；記敘文以記述事件為主。'},
+  {q:'下列哪個是「因果關係」的連接詞？',ch:['雖然…但是','因為…所以','不但…而且','一邊…一邊'],a:1,h:'「因為…所以」表示前後有因果的關係。'},
+  // 【連續文本】作者觀點
+  {q:'📖【連續文本】請讀以下短文後作答：\n\n「電子書固然方便攜帶，但閱讀紙本書時，手指翻頁的觸感、書頁的氣味，都讓人更能靜下心來投入故事。我認為，真正的閱讀體驗是電子書無法完全取代的。」\n\n作者對於電子書的態度是？',
+   ch:['完全反對使用電子書','認為電子書比紙本書更好','認為電子書方便，但無法完全取代紙本書的體驗','認為兩者完全相同'],a:2,
+   h:'作者先承認電子書的優點（方便），再說明紙本書的獨特體驗，最後表達「無法完全取代」的觀點。'},
+  // 【非連續文本】環境標示
+  {q:'♻️【非連續文本】請看以下資源回收分類標示：\n\n【紙類回收桶】\n○ 可放入：報紙、雜誌、紙箱、書本內頁\n✕ 不可放入：蠟光紙、紙杯、鋁箔包、濕紙巾\n\n小惠手上有一本舊雜誌和一個喝完的紙杯，根據標示，她應該怎麼做？',
+   ch:['兩樣都放入紙類回收桶','雜誌放入紙類回收桶，紙杯另外處理','兩樣都不能放入紙類回收桶','紙杯放入紙類回收桶，雜誌另外處理'],a:1,
+   h:'標示說明雜誌「可放入」，紙杯「不可放入」，應分開處理。'}
+]},
+
+// ══ 關 6：海圖測繪室 ══ 舊題×1 + 連續文本×1 + 非連續文本×1 + 混合文本×1
+{emoji:'🌊',name:'海圖測繪室',
+story:'巨大的海圖掛滿四壁，羅盤和六分儀散落桌上。指南針指向正確答案，你找得到嗎？',
+clue:'羅盤的隱藏面板開了，裡面藏著第七關的鑰匙！',qs:[
+  {q:'「故事地圖」通常包含哪些要素？',ch:['起點、終點','人物、背景、問題、解決方法、結局','主題、大意','作者、出版社'],a:1,h:'故事地圖幫助讀者梳理故事的結構要素。'},
+  // 【連續文本】比較異同
+  {q:'📖【連續文本】請讀以下短文後作答：\n\n「章魚有八隻觸手，體內有墨汁可噴出迷惑敵人；烏賊也有十隻觸手，同樣能噴墨，但比章魚更擅長快速變色偽裝。兩者都是頭足類動物，生活在海洋中。」\n\n章魚和烏賊共同具備的能力是？',
+   ch:['快速變色偽裝','有十隻觸手','能噴出墨汁迷惑敵人','在陸地上生活'],a:2,
+   h:'文章明確說明兩者「同樣能噴墨」，但變色是烏賊的專長，觸手數量也不同。'},
+  // 【非連續文本】折線圖
+  {q:'📈【非連續文本】請看以下閱讀冊數統計：\n\n全校每月借書冊數（冊）\n9月：320　10月：280　11月：350　12月：420\n\n根據數據，借書冊數「持續增加」從哪個月開始？',
+   ch:['9月到10月','10月到11月','11月到12月','整個學期都在增加'],a:1,
+   h:'10月（280）→ 11月（350）→ 12月（420），從10月之後連續兩個月增加。'},
+  // 【混合文本】折線圖＋說明文
+  {q:'📑【混合文本】請閱讀以下文字與數據：\n\n文字：「學校在11月推出『閱讀存摺』活動，鼓勵學生記錄每次閱讀的書名與心得。」\n\n數據：10月借書 280 冊 → 11月借書 350 冊 → 12月借書 420 冊\n\n根據文字與數據，哪個推論最合理？',
+   ch:['借書數量與季節有關','11月活動推出後借書數量明顯上升','12月因為考試所以借更多書','活動對借書數量沒有影響'],a:1,
+   h:'11月活動推出後數據確實上升，雖不能完全確定因果，但這是最合理的推論。'}
+]},
+
+// ══ 關 7：科學研究室 ══ 舊題×1 + 連續文本×2 + 非連續文本×1
+{emoji:'🔬',name:'科學研究室',
+story:'試管和燒杯排列整齊，黑板上寫滿了公式與假設。這裡的謎題需要邏輯思維才能解開！',
+clue:'實驗台底部的暗格啟動，噴出了一張解鎖密碼紙！',qs:[
+  {q:'科學報告的「結論」部分，主要在說明什麼？',ch:['實驗步驟','根據數據得出的發現與意義','材料清單','背景資料'],a:1,h:'結論是根據實驗結果所得出的科學發現與意義。'},
+  // 【連續文本】說明文細節
+  {q:'📖【連續文本】請讀以下短文後作答：\n\n「植物的葉子之所以呈現綠色，是因為含有葉綠素。葉綠素能吸收陽光中的紅光和藍光，但會反射綠光，因此我們看到的葉子就是綠色的。秋天溫度降低後，葉綠素分解，葉子便露出原本的黃色和橙色。」\n\n根據文章，葉子在秋天變色的原因是？',
+   ch:['吸收了更多的陽光','葉綠素分解使原本的顏色顯現','氣溫升高讓葉子變色','葉子停止吸收水分'],a:1,
+   h:'文章明確說明「溫度降低後葉綠素分解，葉子便露出原本的黃色和橙色」。'},
+  // 【非連續文本】說明書
+  {q:'📋【非連續文本】請看以下產品說明標示：\n\n【護眼檯燈使用須知】\n✓ 適合閱讀距離：30–50 公分\n✓ 建議每使用 40 分鐘休息 10 分鐘\n✓ 色溫建議：4000K（自然光）\n✗ 請勿直視燈管\n✗ 潮濕環境勿使用\n\n根據說明，下列哪個行為符合正確使用方式？',
+   ch:['將燈放在距書本 20 公分處閱讀','直接對著燈管看燈光顏色','連續使用 2 小時後才休息','在通風乾燥的房間使用，每 40 分鐘休息一次'],a:3,
+   h:'符合「30–50 公分距離、40 分鐘休息、不潮濕環境」等所有規定。'},
+  // 【連續文本】推論作者目的
+  {q:'📖【連續文本】請讀以下短文後作答：\n\n「每年有超過八百萬噸的塑膠廢棄物流入海洋，海龜誤食塑膠袋後無法消化，大量海鳥因此死亡。科學家警告，若繼續這樣下去，到2050年海洋中的塑膠重量可能超過魚類。」\n\n作者寫這段文字，最主要的目的是？',
+   ch:['介紹塑膠的製造過程','說明海洋生物的種類','警示塑膠污染的嚴重性，呼籲重視','描述科學家的研究方法'],a:2,
+   h:'文章列舉具體數據和後果，目的是讓讀者意識到問題的嚴重性。'}
+]},
+
+// ══ 關 8：戲劇排練室 ══ 舊題×1 + 混合文本×2 + 非連續文本×1
+{emoji:'🎭',name:'戲劇排練室',
+story:'空曠的舞台中央只有一盞燈，劇本散落一地。必須讀懂這些文字，才能演好最重要的角色…',
+clue:'一個信封從天花板落下，裡面有通往第九關的邀請函！',qs:[
+  {q:'劇本和一般故事最大的不同是？',ch:['字數比較少','以對話和舞台指示為主要形式','沒有主角','只有動作描寫'],a:1,h:'劇本主要由人物對話和舞台指示構成，供表演使用。'},
+  // 【混合文本】海報＋評論
+  {q:'📑【混合文本】請閱讀以下資料：\n\n【海報文字】\n《追風箏的孩子》改編舞台劇\n演出時間：3/15–3/20，每晚 19:30\n票價：學生 350 元、全票 500 元\n\n【網路評論】\n「劇情忠實呈現原著，但後半部節奏稍快，不熟悉原著的觀眾可能較難跟上。」\n\n根據以上資料，下列說法哪個正確？',
+   ch:['演出共持續兩週','學生票比全票便宜150元','評論認為劇情節奏整體太慢','沒有讀過原著的人一定看不懂'],a:1,
+   h:'學生票350元，全票500元，差距正好是150元。演出只有6天，非兩週。'},
+  // 【非連續文本】對話框/簡訊
+  {q:'📱【非連續文本】請看以下群組對話記錄：\n\n阿明：「明天讀書會幾點開始？」\n小華：「下午兩點，記得帶《夏之庭》第三章的筆記！」\n阿明：「好，我可以晚到半小時嗎？」\n小華：「可以，但第一部分討論你可能會錯過。」\n\n阿明如果晚到，他會錯過什麼？',
+   ch:['帶筆記的時間','第一部分的討論','整個讀書會','小華的分享'],a:1,
+   h:'小華說「第一部分討論你可能會錯過」，這是明確的資訊。'},
+  // 【混合文本】文字＋時間表
+  {q:'📑【混合文本】請閱讀以下資料：\n\n文字：「讀書會規定，討論共分三部分，每部分30分鐘，中間休息10分鐘。」\n\n開始時間：14:00\n\n若阿明 14:30 到達，他還剩多少時間參與讀書會？',
+   ch:['60 分鐘','70 分鐘','80 分鐘','90 分鐘'],a:2,
+   h:'三部分 90 分鐘 + 兩次休息 20 分鐘 = 共 110 分鐘。14:00 開始，15:50 結束。14:30 到達距結束剩 80 分鐘。'},
+]},
+
+// ══ 關 9：地理探索室 ══ 舊題×1 + 連續文本×1 + 非連續文本×1 + 混合文本×1
+{emoji:'🗺️',name:'地理探索室',
+story:'巨大的世界地圖從天花板垂掛而下，每個大陸都藏著一個謎題。你的閱讀地圖在哪裡？',
+clue:'南極洲標記旁的機關鬆動了，第十關的路在腳下開啟！',qs:[
+  {q:'「主旨」是指文章的什麼？',ch:['文章的第一段','作者最想傳達的核心訊息','文章中最長的句子','出現最多次的詞語'],a:1,h:'主旨是作者透過全文想表達的最重要的中心思想。'},
+  // 【連續文本】多段落整合
+  {q:'📖【連續文本】請讀以下短文後作答：\n\n「亞馬遜雨林覆蓋南美洲九個國家，產生全球約20%的氧氣，擁有世界上最豐富的生物多樣性。然而近年來，大規模砍伐使雨林面積每年減少相當於一個比利時的大小。科學家警告，若砍伐持續，雨林可能在本世紀內崩潰，影響全球氣候。」\n\n根據文章，亞馬遜雨林被砍伐最嚴重的後果可能是什麼？',
+   ch:['南美洲的農業收入減少','部分動植物品種將消失','雨林崩潰進而影響全球氣候','砍樹工人的工作機會增加'],a:2,
+   h:'文章最後說明「雨林可能崩潰，影響全球氣候」，這是作者強調的最嚴重後果。'},
+  // 【非連續文本】地圖圖例
+  {q:'🗺️【非連續文本】請看以下地圖圖例說明：\n\n地圖圖例：\n● 紅色區域 = 禁止進入（生態保護區）\n● 綠色區域 = 開放健行步道\n● 藍色區域 = 水域（禁止游泳）\n● 黃色旗幟 = 服務站（提供飲水）\n\n小隊伍想健行並補充飲水，他們應該前往哪種區域或標示？',
+   ch:['紅色區域','綠色區域並尋找黃色旗幟','藍色區域','任何顏色區域都可以'],a:1,
+   h:'健行需走「綠色區域（開放步道）」，補水需找「黃色旗幟（服務站）」，兩者結合才正確。'},
+  // 【混合文本】地圖＋行程說明
+  {q:'📑【混合文本】請閱讀以下文字與說明：\n\n文字：「學校校外教學路線：出發→服務站（補水）→生態觀察區→終點。全程約3小時。」\n\n圖例補充：生態觀察區位於綠色區域內，服務站設有黃色旗幟標示。\n\n根據文字與圖例，下列說法哪個正確？',
+   ch:['生態觀察區是禁止進入的紅色區域','整個路線不包含補水站','學生可以在服務站補充飲水後再前往生態觀察區','水域區域是路線的終點'],a:2,
+   h:'路線說明服務站在補水點，圖例說明服務站有黃色旗幟，生態觀察區在綠色區域，順序符合。'}
+]},
+
+// ══ 關 10：藝術工作室 ══ 舊題×1 + 連續文本×1 + 非連續文本×1 + 混合文本×1
+{emoji:'🎨',name:'藝術工作室',
+story:'畫布、雕塑和色彩斑斕的作品充滿整個空間。創意的謎題就藏在美麗的藝術之中…',
+clue:'一幅畫的背面貼著第十一關的入口座標！',qs:[
+  {q:'「意境」在詩歌中是指什麼？',ch:['詩的長度','詩透過文字所營造的情感氛圍與想象空間','詩的押韻方式','詩人的生平'],a:1,h:'意境是詩歌透過文字所創造的情感、畫面和想象的統一境界。'},
+  // 【連續文本】詩歌理解
+  {q:'📖【連續文本】請讀以下新詩後作答：\n\n「窗外的雨\n打在葉子上\n像媽媽的手\n輕輕拍著我\n說：沒關係\n明天還會有太陽」\n\n這首詩的主要情感是？',
+   ch:['對下雨天感到厭煩','描述暴風雨的可怕','在低落時感受到溫柔的安慰與希望','對媽媽感到生氣'],a:2,
+   h:'「媽媽的手輕輕拍著」和「明天還會有太陽」，傳達了溫柔安慰與希望的情感。'},
+  // 【非連續文本】展覽說明牌
+  {q:'🖼️【非連續文本】請看以下美術館說明牌：\n\n作品名稱：《晨霧中的山》\n創作者：林大為（1920–1985）\n媒材：水墨、宣紙\n尺寸：120×80 公分\n收藏：國立美術館永久典藏\n說明：此作品描繪清晨霧氣籠罩山峰的靜謐景色，展現傳統水墨的留白之美。\n\n根據說明牌，以下哪項描述正確？',
+   ch:['此畫使用油彩繪製','創作者目前仍在世','作品寬度大於高度','此作品為國立美術館永久典藏'],a:3,
+   h:'說明牌明確標示「國立美術館永久典藏」；媒材是水墨（非油彩）；尺寸120×80，高度120大於寬度80。'},
+  // 【混合文本】評論＋說明牌
+  {q:'📑【混合文本】請閱讀以下資料：\n\n說明牌：《晨霧中的山》，水墨、宣紙，120×80公分，林大為（1920–1985）\n\n評論：「林大為善用留白技法，讓觀者的目光在實與虛之間流動，產生無限遐想。」\n\n根據說明牌和評論，以下哪個推論最合理？',
+   ch:['林大為晚年才學習水墨畫','《晨霧中的山》可能大量使用空白來呈現霧氣','評論者認為這幅畫太過簡單','水墨畫一定比油畫更有價值'],a:1,
+   h:'評論說林大為「善用留白技法」，說明牌主題是「晨霧」，兩者結合可推論畫中留白用來表現霧氣。'}
+]},
+
+// ══ 關 11：煉金術士的研究室 ══ 舊題×1 + 連續文本×1 + 非連續文本×1 + 混合文本×1
+{emoji:'⚗️',name:'煉金術士的研究室',
+story:'古老的爐火閃爍，神秘的符文覆蓋著牆面。煉金術士留下了謎題——能量就藏在正確答案中！',
+clue:'神秘的爐火變成了金色，長廊盡頭的最終密室就在眼前！',qs:[
+  {q:'「詮釋」和「理解」的差別在於？',ch:['詮釋比較快','詮釋需要加入讀者自己的分析和觀點','理解比較難','兩者完全相同'],a:1,h:'理解是掌握文章的字面意思，詮釋則需加入讀者的分析和觀點。'},
+  // 【連續文本】議論文觀點
+  {q:'📖【連續文本】請讀以下短文後作答：\n\n「有人認為手機讓人際關係變差，因為大家低頭滑手機、忽視眼前的人。但也有人指出，手機讓身處遠方的人能即時聯繫，彌補了距離的遺憾。對我而言，手機是工具，關鍵在於使用者如何取捨。」\n\n作者最終的立場是什麼？',
+   ch:['手機讓人際關係變差','手機對人際關係有益','手機只是工具，使用方式才是關鍵','手機應該全面禁止'],a:2,
+   h:'作者最後說「手機是工具，關鍵在於使用者如何取捨」，這是他的核心立場。'},
+  // 【非連續文本】藥品說明書
+  {q:'💊【非連續文本】請看以下藥品使用說明：\n\n【感冒藥服用說明】\n用量：成人每次2顆，兒童（6–12歲）每次1顆\n服用時間：每8小時服用一次\n注意事項：\n・開車前請勿服用（易嗜睡）\n・勿與其他感冒藥同時服用\n・12歲以下兒童請在醫師指導下使用\n\n10歲的小明感冒了，以下哪個做法正確？',
+   ch:['自行服用，每次2顆','每6小時服用1顆','在家長陪同下諮詢醫師後再服用','與另一種感冒藥一起服用效果更好'],a:2,
+   h:'說明書指出「12歲以下兒童請在醫師指導下使用」，10歲的小明應先諮詢醫師。'},
+  // 【混合文本】新聞標題＋統計
+  {q:'📑【混合文本】請閱讀以下資料：\n\n新聞標題：「研究顯示：每日閱讀30分鐘的學生，語文成績平均高出15%」\n\n班級調查結果：\n每日閱讀30分鐘以上：8人（40%）\n每日閱讀不足30分鐘：12人（60%）\n\n根據新聞與調查，以下哪個推論最合理？',
+   ch:['班上所有閱讀不足的學生語文成績一定較差','班上約有40%的學生符合研究建議的閱讀量','讀30分鐘以上的學生語文成績一定是全班最高','這個研究結果不可信'],a:1,
+   h:'調查顯示40%的學生每日閱讀30分鐘以上，這與研究建議相符，是最直接可推論的事實。'}
+]},
+
+// ══ 關 12：最終聖殿 ══ 舊題×1 + 連續文本×1 + 非連續文本×1 + 混合文本×1
+{emoji:'🌟',name:'最終聖殿',
+story:'你已走過 11 間密室！眼前這座金光閃閃的聖殿，就是最後的考驗。集結所有閱讀力量，打開自由之門！',
+clue:'🎉 聖殿的大門轟然開啟——你自由了！閱讀力量萬歲！',qs:[
+  {q:'「後設認知」在閱讀中是指？',ch:['閱讀速度','讀者監控自己理解狀況並調整策略的能力','選擇書籍的方法','記憶文章的技巧'],a:1,h:'後設認知是指讀者能覺察自己是否理解，並在需要時調整閱讀策略。'},
+  // 【連續文本】綜合評估（最高層次）
+  {q:'📖【連續文本】請讀以下短文後作答：\n\n「一位老人每天在公園餵鴿子，風雨無阻，從未間斷。有人問他：『這些鴿子又不會感謝你，為什麼要花這個時間？』老人微笑說：『我不是為了感謝而做，是因為這讓我覺得自己還有用。』」\n\n老人的話最能說明什麼道理？',
+   ch:['養鴿子是很好的休閒活動','付出的價值不在於獲得回報，而在於行為本身的意義','老人非常孤獨，需要陪伴','感謝是人際關係最重要的事'],a:1,
+   h:'老人說「不是為了感謝而做，是因為讓自己覺得有用」，核心在於付出本身的意義，而非回報。'},
+  // 【非連續文本】複合表格
+  {q:'📊【非連續文本】請看以下全校閱讀成果表：\n\n年級｜參加人數｜完成閱讀護照人數｜完成率\n一年級｜80人｜60人｜75%\n二年級｜75人｜45人｜60%\n三年級｜90人｜72人｜80%\n四年級｜85人｜68人｜80%\n五年級｜70人｜56人｜80%\n六年級｜65人｜52人｜80%\n\n根據表格，哪個年級的完成率最低？',
+   ch:['一年級','二年級','三年級','六年級'],a:1,
+   h:'二年級完成率60%，低於其他所有年級，是完成率最低的年級。'},
+  // 【混合文本】最終綜合
+  {q:'📑【混合文本】請閱讀以下資料：\n\n校長公告：「為鼓勵閱讀，完成率達80%以上的年級，全年級師生將獲頒『閱讀榮譽旗』。」\n\n表格：一年級75%、二年級60%、三至六年級各80%\n\n根據公告與表格，以下說法哪個正確？',
+   ch:['所有年級都能獲得閱讀榮譽旗','只有三到六年級能獲得閱讀榮譽旗','一年級和二年級都無法獲得榮譽旗','二年級如果再努力一點就能達標'],a:1,
+   h:'公告條件是完成率80%以上，三至六年級達到80%，一年級（75%）和二年級（60%）均未達標，所以只有三到六年級獲得榮譽旗。'}
+]}
+]}
+
+// ═════════ GAME STATE ═════════
+let S={};let timerIv=null;let lbData=[];let currentTab='全部';
+function initState(){S={name:'',cls:'',stage:0,q:0,secs:0,hints:0,hintUsed:false,answered:false}}
+
+// ═════════ HELPERS ═════════
+function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active')}
+function toast(msg,ms=2500){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),ms)}
+function fmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function updateCounts(){const n=ROOMS.length;document.getElementById('titleRoomCount').textContent=n+' 個密室';document.getElementById('regRoomCount').textContent=n+' 關'}
+
+// Stars
+(function(){const bg=document.getElementById('stars');for(let i=0;i<90;i++){const s=document.createElement('div');s.className='st';const sz=Math.random()<.7?1:2;s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${2+Math.random()*5}s;--dl:${Math.random()*6}s;--op:${.2+Math.random()*.8}`;bg.appendChild(s)}})();
+
+// ═════════ GAME ═════════
+function startGame(){
+  const name=document.getElementById('pName').value.trim();
+  const cls=document.getElementById('pCls').value;
+  if(!name){toast('⚠️ 請輸入姓名');return}
+  if(!cls){toast('⚠️ 請選擇班級');return}
+  if(!ROOMS.length){toast('⚠️ 尚無關卡');return}
+  initState();S.name=name;S.cls=cls;
+  document.getElementById('gName').textContent=name;
+  document.getElementById('gCls').textContent=cls;
+  go('gameScreen');startTimer();renderRoom();
+}
+function startTimer(){clearInterval(timerIv);const el=document.getElementById('gTimer');timerIv=setInterval(()=>{S.secs++;el.textContent=fmt(S.secs);el.classList.toggle('warn',S.secs>360)},1000)}
+function stopTimer(){clearInterval(timerIv)}
+function renderRoom(){
+  const room=ROOMS[S.stage];S.q=0;S.answered=false;S.hintUsed=false;
+  document.getElementById('rIcon').textContent=room.emoji;
+  document.getElementById('rName').textContent=room.name;
+  document.getElementById('rStory').textContent=room.story;
+  document.getElementById('gPill').textContent=`第 ${S.stage+1} 關`;
+  document.getElementById('sc').classList.remove('on');
+  document.getElementById('qBox').style.display='';
+  const card=document.getElementById('roomCard');card.style.animation='none';requestAnimationFrame(()=>{card.style.animation=''});
+  updateProg();renderQ();
+}
+function renderQ(){
+  const room=ROOMS[S.stage];const q=room.qs[S.q];
+  S.answered=false;S.hintUsed=false;
+  document.getElementById('qMeta').textContent=`問題 ${S.q+1} / ${room.qs.length}`;
+  document.getElementById('qText').textContent=q.q;
+  const keys=['Ａ','Ｂ','Ｃ','Ｄ'];
+  const div=document.getElementById('qChoices');div.innerHTML='';
+  q.ch.forEach((c,i)=>{const b=document.createElement('button');b.className='c-btn';b.innerHTML=`<span class="key">${keys[i]}</span>${esc(c)}`;b.onclick=()=>answer(i);div.appendChild(b)});
+  document.getElementById('fb').className='fb';document.getElementById('fb').innerHTML='';
+  document.getElementById('hBox').classList.remove('on');document.getElementById('hBox').textContent='';
+  document.getElementById('hLbl').textContent='💡 提示：1 次';document.getElementById('hBtn').disabled=false;
+  updateProg();
+}
+function updateProg(){
+  const total=ROOMS.reduce((a,r)=>a+r.qs.length,0);
+  const done=ROOMS.slice(0,S.stage).reduce((a,r)=>a+r.qs.length,0)+S.q;
+  const pct=Math.round(done/total*100);
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progPct').textContent=pct+'%';
+  document.getElementById('progLbl').textContent=`進度 ${done}/${total} 題`;
+}
+function answer(idx){
+  if(S.answered)return;S.answered=true;
+  const q=ROOMS[S.stage].qs[S.q];
+  const btns=document.querySelectorAll('.c-btn');btns.forEach(b=>b.disabled=true);
+  btns[idx].classList.add(idx===q.a?'correct':'wrong');btns[q.a].classList.add('correct');
+  const fb=document.getElementById('fb');
+  if(idx===q.a){fb.className='fb ok';fb.innerHTML='✅ 答對了！封印解除！';setTimeout(advQ,1100)}
+  else{fb.className='fb no';fb.innerHTML='❌ 答錯了！正確答案已標示，繼續加油！';setTimeout(advQ,1900)}
+}
+function advQ(){S.q++;if(S.q>=ROOMS[S.stage].qs.length)showStageEnd();else renderQ()}
+function useHint(){
+  if(S.hintUsed){toast('⚠️ 每題只能提示一次');return}if(S.answered)return;
+  S.hintUsed=true;S.hints++;
+  const q=ROOMS[S.stage].qs[S.q];
+  document.getElementById('hBox').textContent='💡 '+q.h;document.getElementById('hBox').classList.add('on');
+  document.getElementById('hLbl').textContent='💡 提示：0 次';document.getElementById('hBtn').disabled=true;
+}
+function showStageEnd(){
+  const room=ROOMS[S.stage];const isLast=S.stage===ROOMS.length-1;
+  document.getElementById('qBox').style.display='none';
+  const sc=document.getElementById('sc');sc.classList.add('on');
+  document.getElementById('scEmoji').textContent=isLast?'🎉':'🔓';
+  document.getElementById('scTitle').textContent=isLast?'全部解鎖！！':`第 ${S.stage+1} 關完成！`;
+  document.getElementById('scMsg').textContent=room.clue;
+  const btn=document.getElementById('scBtn');
+  if(isLast){btn.textContent='🏆 查看成績';btn.onclick=showResult}else{btn.textContent='🚪 前往下一關';btn.onclick=nextStage}
+}
+function nextStage(){S.stage++;renderRoom()}
+function showResult(){
+  stopTimer();const medal=getMedal(S.secs,S.hints);
+  document.getElementById('resTrophy').textContent=medal.id;
+  document.getElementById('rName2').textContent=S.name;
+  document.getElementById('rCls').textContent=S.cls;
+  document.getElementById('rTime').textContent=fmt(S.secs);
+  document.getElementById('rHints').textContent=S.hints+' 次';
+  document.getElementById('rMedal').textContent=medal.id+' '+medal.label+'勳章';
+  document.getElementById('subStatus').textContent='正在提交成績…';
+  document.getElementById('subStatus').style.color='var(--dim)';
+  const im=document.getElementById('improveMsg');
+  if(im){im.style.display='none';im.textContent=''}
+  go('resultScreen');submitScore(medal);
+}
+async function submitScore(medal){
+  const el=document.getElementById('subStatus');
+  const improveEl=document.getElementById('improveMsg');
+  if(!GAS_URL){el.textContent='⚠️ 未設定後端，成績未儲存';return}
+  try{
+    const r=await fetch(GAS_URL,{method:'POST',body:JSON.stringify({
+      name:S.name,cls:S.cls,seconds:S.secs,hints:S.hints,
+      medalLevel:medal.order,medal:medal.id+' '+medal.label+'勳章'
+    })});
+    const d=await r.json();
+    if(d.success){
+      el.textContent='✅ 成績已記錄！';el.style.color='#5dde94';
+      if(improveEl){
+        if(d.isNew){
+          improveEl.innerHTML='🌟 首次完成，成績登榜！';
+          improveEl.className='improve-tag new';
+        } else if(d.improved){
+          improveEl.innerHTML='🚀 破個人最佳紀錄！榜上已更新';
+          improveEl.className='improve-tag better';
+        } else {
+          improveEl.innerHTML='📊 未超越個人最佳，再接再厲！（第 '+d.playCount+' 次挑戰）';
+          improveEl.className='improve-tag same';
+        }
+        improveEl.style.display='flex';
+      }
+    }else throw new Error(d.error);
+  }catch(e){el.textContent='⚠️ 提交失敗：'+e.message;el.style.color='#e87070'}
+}
+function restartGame(){go('registerScreen')}
+
+// ═════════ LEADERBOARD ═════════
+async function showLb(){go('lbScreen');loadLb()}
+async function loadLb(){
+  document.getElementById('lbContent').innerHTML='<div class="lb-empty">⏳ 載入中…</div>';
+  if(!GAS_URL){document.getElementById('lbContent').innerHTML='<div class="lb-empty">⚙️ 尚未設定 GAS 後端</div>';return}
+  try{const r=await fetch(GAS_URL+'?action=lb&t='+Date.now());lbData=await r.json();renderLb()}
+  catch(e){document.getElementById('lbContent').innerHTML='<div class="lb-empty">❌ 無法載入：'+esc(e.message)+'</div>'}
+}
+function setTab(t){
+  currentTab=t;
+  document.querySelectorAll('.tab').forEach(el=>el.classList.toggle('active',el.textContent.startsWith(t==='全部'?'全部':t)));
+  renderLb();
+}
+function renderLb(){
+  const el=document.getElementById('lbContent');
+  if(!lbData||!lbData.length){el.innerHTML='<div class="lb-empty">📭 排行榜尚無資料</div>';return}
+  let data=[...lbData].sort((a,b)=>a.medalLevel!==b.medalLevel?a.medalLevel-b.medalLevel:a.seconds-b.seconds);
+  if(currentTab!=='全部')data=data.filter(r=>r.medal&&r.medal.startsWith(currentTab));
+  if(!data.length){el.innerHTML='<div class="lb-empty">此勳章等級暫無資料</div>';return}
+  const rankIcons=['r1','r2','r3','',''];const rankEmoji=['🥇','🥈','🥉','4️⃣','5️⃣'];
+  let html=`<table class="lb-table"><thead><tr><th style="width:44px;text-align:center">排名</th><th>姓名/班級</th><th style="text-align:center">勳章</th><th style="text-align:right">最佳時間</th><th style="text-align:center">提示</th><th style="text-align:center">挑戰次數</th></tr></thead><tbody>`;
+  data.slice(0,30).forEach((row,i)=>{
+    const ri=Math.min(i,4);
+    const pc=row.playCount||1;
+    const pcBadge=pc>1?`<span style="font-size:10px;background:rgba(123,82,208,.22);color:#c5a8e8;padding:2px 6px;border-radius:8px;margin-left:4px">×${pc}</span>`:'';
+    html+=`<tr class="lb-row"><td class="lb-rank ${rankIcons[ri]}">${i<3?rankEmoji[i]:i+1}</td><td><div class="lb-name">${esc(row.name)}${pcBadge}</div><div class="lb-cls">${esc(row.cls)}</div></td><td style="text-align:center;font-size:14px">${esc(row.medal||'—')}</td><td class="lb-time">${fmt(row.seconds)}</td><td style="text-align:center;color:var(--dim);font-size:11px">${row.hints}次</td><td style="text-align:center;color:var(--dim);font-size:11px">${pc}次</td></tr>`;
+  });
+  html+='</tbody></table>';el.innerHTML=html;
+}
+
+// ═════════ GAS MODAL ═════════
+function openGas(){document.getElementById('gasIn').value=GAS_URL;document.getElementById('gasModal').classList.add('on')}
+function closeGas(){document.getElementById('gasModal').classList.remove('on')}
+function saveGas(){const url=document.getElementById('gasIn').value.trim();if(url&&!url.startsWith('https://script.google.com')){toast('⚠️ 請輸入正確 GAS 網址');return}GAS_URL=url;localStorage.setItem('gasUrl',url);closeGas();toast('✅ 設定已儲存！')}
+function copyGas(){navigator.clipboard.writeText(document.getElementById('gasCode').textContent).then(()=>toast('✅ 程式碼已複製！'))}
+
+// ═════════ PASSWORD MODAL ═════════
+function openPwModal(){document.getElementById('pwInput').value='';document.getElementById('pwError').classList.remove('on');document.getElementById('pwModal').classList.add('on');setTimeout(()=>document.getElementById('pwInput').focus(),100)}
+function closePwModal(){document.getElementById('pwModal').classList.remove('on')}
+function checkPw(){
+  if(document.getElementById('pwInput').value===ADMIN_PW){closePwModal();openAdmin()}
+  else{document.getElementById('pwError').classList.add('on');document.getElementById('pwInput').value='';document.getElementById('pwInput').focus()}
+}
+
+// ═════════ ADMIN ═════════
+let curRoom=-1;
+
+function openAdmin(){go('adminScreen');admNav('rooms')}
+function admLogout(){curRoom=-1;go('titleScreen');toast('已退出管理後台')}
+
+function admNav(s){
+  ['rooms','settings','pw'].forEach(id=>{
+    document.getElementById('adm'+id.charAt(0).toUpperCase()+id.slice(1)).style.display=s===id?'':'none';
+    document.getElementById('nav'+id.charAt(0).toUpperCase()+id.slice(1)).classList.toggle('active',s===id);
+  });
+  if(s==='rooms')renderAdmRoomList();
+  if(s==='settings')loadAdmSettings();
+}
+
+function renderAdmRoomList(){
+  const totalQ=ROOMS.reduce((a,r)=>a+r.qs.length,0);
+  document.getElementById('admStats').innerHTML=`
+    <div class="stat-card"><div class="stat-num">${ROOMS.length}</div><div class="stat-lbl">關卡數</div></div>
+    <div class="stat-card"><div class="stat-num">${totalQ}</div><div class="stat-lbl">總題目數</div></div>
+    <div class="stat-card"><div class="stat-num">${ROOMS.length?Math.round(totalQ/ROOMS.length*10)/10:0}</div><div class="stat-lbl">平均題數/關</div></div>`;
+  const el=document.getElementById('admRoomList');
+  if(!ROOMS.length){el.innerHTML='<div style="color:var(--dim);font-size:14px;padding:18px;text-align:center">尚無關卡，點選「新增關卡」開始</div>';return}
+  el.innerHTML=ROOMS.map((r,i)=>`
+    <div class="room-item ${curRoom===i?'selected':''}" onclick="editRoom(${i})">
+      <div class="room-item-left">
+        <div class="room-item-emoji">${r.emoji}</div>
+        <div><div class="room-item-name">第 ${i+1} 關：${esc(r.name)}</div><div class="room-item-meta">${r.qs.length} 題</div></div>
+      </div>
+      <div class="room-item-right">
+        <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();moveRoom(${i},-1)" ${i===0?'disabled':''}>↑</button>
+        <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();moveRoom(${i},1)" ${i===ROOMS.length-1?'disabled':''}>↓</button>
+        <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();editRoom(${i})">✏️</button>
+      </div>
+    </div>`).join('');
+  updateCounts();
+}
+
+function moveRoom(i,d){
+  const t=i+d;if(t<0||t>=ROOMS.length)return;
+  [ROOMS[i],ROOMS[t]]=[ROOMS[t],ROOMS[i]];
+  if(curRoom===i)curRoom=t;else if(curRoom===t)curRoom=i;
+  saveRooms();renderAdmRoomList();toast('✅ 順序已更新');
+}
+
+function editRoom(i){
+  curRoom=i;const room=ROOMS[i];
+  document.getElementById('admQEditor').style.display='';
+  document.getElementById('qEdRoomName').textContent=`${room.emoji} ${room.name}`;
+  document.getElementById('qEdRoomMeta').textContent=`第 ${i+1} 關 · ${room.qs.length} 題`;
+  document.getElementById('metaName').value=room.name;
+  document.getElementById('metaStory').value=room.story;
+  document.getElementById('metaClue').value=room.clue;
+  document.getElementById('metaEmojiDisplay').textContent=room.emoji;
+  renderEmojiPicker(room.emoji);renderQList();setSI(true);
+  document.getElementById('admQEditor').scrollIntoView({behavior:'smooth'});
+  renderAdmRoomList();
+}
+
+function closeQEditor(){document.getElementById('admQEditor').style.display='none';curRoom=-1;renderAdmRoomList()}
+
+function renderEmojiPicker(sel){
+  document.getElementById('emojiPicker').innerHTML=EMOJIS.map(e=>`<button class="ep-btn ${e===sel?'sel':''}" onclick="selEmoji('${e}')">${e}</button>`).join('');
+}
+function selEmoji(e){
+  if(curRoom<0)return;ROOMS[curRoom].emoji=e;
+  document.getElementById('metaEmojiDisplay').textContent=e;
+  renderEmojiPicker(e);setSI(false);
+}
+
+function setSI(saved){const el=document.getElementById('saveIndicator');el.className='save-indicator '+(saved?'saved':'unsaved');el.textContent=saved?'● 已儲存':'● 未儲存'}
+function metaChanged(){setSI(false)}
+
+function saveMeta(){
+  if(curRoom<0)return;
+  const name=document.getElementById('metaName').value.trim();
+  if(!name){toast('⚠️ 請輸入密室名稱');return}
+  ROOMS[curRoom].name=name;
+  ROOMS[curRoom].story=document.getElementById('metaStory').value.trim();
+  ROOMS[curRoom].clue=document.getElementById('metaClue').value.trim();
+  saveRooms();
+  document.getElementById('qEdRoomName').textContent=`${ROOMS[curRoom].emoji} ${name}`;
+  setSI(true);renderAdmRoomList();toast('✅ 密室資訊已儲存');
+}
+
+function addRoom(){
+  ROOMS.push({emoji:'📖',name:'新密室',story:'這間密室藏著神秘的謎題，等待你來解開…',clue:'你找到了前往下一關的線索！',qs:[{q:'請輸入題目',ch:['選項甲','選項乙','選項丙','選項丁'],a:0,h:'提示文字'}]});
+  saveRooms();toast('✅ 新增關卡成功');editRoom(ROOMS.length-1);
+}
+
+function deleteRoom(){
+  if(curRoom<0)return;
+  if(!confirm(`確定要刪除「${ROOMS[curRoom].name}」嗎？`))return;
+  ROOMS.splice(curRoom,1);saveRooms();closeQEditor();toast('🗑️ 已刪除關卡');
+}
+
+// Question list
+function renderQList(){
+  if(curRoom<0)return;
+  const room=ROOMS[curRoom];
+  document.getElementById('qCountLabel').textContent=room.qs.length+' 題';
+  document.getElementById('qEdRoomMeta').textContent=`第 ${curRoom+1} 關 · ${room.qs.length} 題`;
+  if(!room.qs.length){document.getElementById('qList').innerHTML='<div style="color:var(--dim);font-size:13px;padding:10px 0">尚無題目，點選下方「新增題目」</div>';return}
+  document.getElementById('qList').innerHTML=room.qs.map((q,qi)=>renderQCard(qi,q)).join('');
+}
+
+function renderQCard(qi,q){
+  const keys=['Ａ','Ｂ','Ｃ','Ｄ'];
+  const maxQ=curRoom>=0?ROOMS[curRoom].qs.length:99;
+  const optsHtml=q.ch.map((c,ci)=>`
+    <label class="answer-opt ${ci===q.a?'correct-ans':''}">
+      <input type="radio" name="ans_${curRoom}_${qi}" value="${ci}" ${ci===q.a?'checked':''} onchange="setAns(${qi},${ci})">
+      <span class="answer-opt-label">${keys[ci]}</span>
+      <input type="text" value="${esc(c)}" placeholder="選項${keys[ci]}" oninput="setChoice(${qi},${ci},this.value)">
+    </label>`).join('');
+  return `<div class="q-card" id="qCard_${qi}">
+    <div class="q-card-header">
+      <span class="q-num-badge">第 ${qi+1} 題</span>
+      <div class="q-card-actions">
+        <button class="btn btn-ghost btn-xs" onclick="moveQ(${qi},-1)" ${qi===0?'disabled':''}>↑</button>
+        <button class="btn btn-ghost btn-xs" onclick="moveQ(${qi},1)" ${qi===maxQ-1?'disabled':''}>↓</button>
+        <button class="btn btn-danger btn-xs" onclick="deleteQ(${qi})">🗑️</button>
+      </div>
+    </div>
+    <div class="ig" style="margin-bottom:10px"><label>題目</label><textarea rows="2" oninput="setQText(${qi},this.value)">${esc(q.q)}</textarea></div>
+    <div class="ig" style="margin-bottom:10px"><label>選項（選取圓鈕 = 正確答案）</label><div class="answer-grid">${optsHtml}</div></div>
+    <div class="ig" style="margin:0"><label>💡 提示文字</label><input value="${esc(q.h)}" placeholder="提示…" oninput="setHint(${qi},this.value)"></div>
+  </div>`;
+}
+
+function setQText(qi,v){if(curRoom<0)return;ROOMS[curRoom].qs[qi].q=v;setSI(false)}
+function setChoice(qi,ci,v){if(curRoom<0)return;ROOMS[curRoom].qs[qi].ch[ci]=v;setSI(false)}
+function setAns(qi,ci){
+  if(curRoom<0)return;ROOMS[curRoom].qs[qi].a=ci;setSI(false);
+  const card=document.getElementById('qCard_'+qi);
+  if(card)card.querySelectorAll('.answer-opt').forEach((el,i)=>el.classList.toggle('correct-ans',i===ci));
+}
+function setHint(qi,v){if(curRoom<0)return;ROOMS[curRoom].qs[qi].h=v;setSI(false)}
+
+function addQuestion(){
+  if(curRoom<0)return;
+  ROOMS[curRoom].qs.push({q:'請輸入題目',ch:['選項甲','選項乙','選項丙','選項丁'],a:0,h:'提示文字'});
+  saveRooms();renderQList();setSI(false);
+  setTimeout(()=>{const cs=document.querySelectorAll('.q-card');if(cs.length)cs[cs.length-1].scrollIntoView({behavior:'smooth'})},100);
+}
+
+function deleteQ(qi){
+  if(curRoom<0)return;
+  if(ROOMS[curRoom].qs.length<=1){toast('⚠️ 每關至少需要 1 道題目');return}
+  if(!confirm('確定要刪除這道題目嗎？'))return;
+  ROOMS[curRoom].qs.splice(qi,1);saveRooms();renderQList();setSI(true);
+}
+
+function moveQ(qi,d){
+  if(curRoom<0)return;const qs=ROOMS[curRoom].qs;const t=qi+d;
+  if(t<0||t>=qs.length)return;[qs[qi],qs[t]]=[qs[t],qs[qi]];saveRooms();renderQList();
+}
+
+// Auto-save
+let autoSaveTimer=null;
+document.addEventListener('input',e=>{
+  if(e.target.closest('#admQEditor')&&curRoom>=0){
+    setSI(false);clearTimeout(autoSaveTimer);
+    autoSaveTimer=setTimeout(()=>{saveRooms();setSI(true)},900);
+  }
+});
+
+// Settings
+function loadAdmSettings(){
+  document.getElementById('admGasIn').value=GAS_URL;
+  document.getElementById('mDiaSec').value=MEDALS[0].maxSec;
+  document.getElementById('mDiaHints').value=MEDALS[0].maxHints;
+  document.getElementById('mGoldSec').value=MEDALS[1].maxSec;
+  document.getElementById('mGoldHints').value=MEDALS[1].maxHints;
+  document.getElementById('mSilSec').value=MEDALS[2].maxSec;
+}
+function admSaveGas(){const url=document.getElementById('admGasIn').value.trim();GAS_URL=url;localStorage.setItem('gasUrl',url);document.getElementById('gasIn').value=url;toast('✅ GAS 網址已儲存')}
+function saveMedalSettings(){
+  MEDALS[0].maxSec=+document.getElementById('mDiaSec').value||180;
+  MEDALS[0].maxHints=+document.getElementById('mDiaHints').value||0;
+  MEDALS[1].maxSec=+document.getElementById('mGoldSec').value||300;
+  MEDALS[1].maxHints=+document.getElementById('mGoldHints').value||3;
+  MEDALS[2].maxSec=+document.getElementById('mSilSec').value||480;
+  localStorage.setItem('medalCfg',JSON.stringify(MEDALS));
+  toast('✅ 勳章設定已儲存');
+}
+
+// Change Password
+function changePw(){
+  const old=document.getElementById('oldPw').value;
+  const np=document.getElementById('newPw').value;
+  const cp=document.getElementById('confirmPw').value;
+  const err=document.getElementById('pwChangeError');
+  err.classList.remove('on');
+  if(old!==ADMIN_PW){err.textContent='❌ 目前密碼錯誤';err.classList.add('on');return}
+  if(np.length<4){err.textContent='❌ 新密碼至少需要 4 個字元';err.classList.add('on');return}
+  if(np!==cp){err.textContent='❌ 兩次新密碼不一致';err.classList.add('on');return}
+  ADMIN_PW=np;localStorage.setItem('adminPw',np);
+  ['oldPw','newPw','confirmPw'].forEach(id=>document.getElementById(id).value='');
+  toast('✅ 密碼已成功更新！');
+}
+
+// Init
+updateCounts();
+</script>
+</body>
+</html>
