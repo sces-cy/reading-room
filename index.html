@@ -47,14 +47,14 @@ textarea{resize:vertical;line-height:1.6}
 @keyframes roomIn{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:none}}
 @keyframes bounce{from{transform:scale(0) rotate(-15deg)}to{transform:scale(1) rotate(0)}}
 @keyframes warn{0%,100%{opacity:1}50%{opacity:.4}}
-
+ 
 /* TITLE */
 #titleScreen{gap:18px;text-align:center}
 .title-emoji{font-size:68px;animation:flt 4s ease-in-out infinite}
 .title-glow{font-size:clamp(26px,6vw,52px);color:var(--gold);animation:glow 3s ease-in-out infinite}
 .title-sub{font-size:13px;letter-spacing:4px;color:var(--dim);margin-top:-8px}
 .title-desc{max-width:460px;color:var(--dim);line-height:1.9;font-size:14px;border:1px solid rgba(201,168,76,.18);background:rgba(201,168,76,.05);padding:14px 22px;border-radius:var(--radius)}
-
+ 
 /* GAME */
 #gameScreen{justify-content:flex-start;padding:12px;gap:0}
 .g-header{width:100%;max-width:720px;display:flex;align-items:center;justify-content:space-between;padding:10px 18px;background:rgba(18,16,32,.9);border:1px solid rgba(201,168,76,.18);border-radius:var(--radius);margin-bottom:12px;flex-wrap:wrap;gap:8px}
@@ -96,7 +96,7 @@ textarea{resize:vertical;line-height:1.6}
 .sc-emoji{font-size:72px;animation:bounce .5s cubic-bezier(.34,1.56,.64,1);margin-bottom:10px}
 .sc-title{font-size:20px;font-weight:900;color:var(--gold);margin-bottom:6px}
 .sc-msg{color:var(--dim);font-size:14px;line-height:1.7;margin-bottom:18px;max-width:400px;margin-left:auto;margin-right:auto}
-
+ 
 /* RESULT */
 #resultScreen{gap:18px;text-align:center}
 .res-trophy{font-size:80px;animation:flt 3.5s ease-in-out infinite}
@@ -105,7 +105,7 @@ textarea{resize:vertical;line-height:1.6}
 .r-stat:last-child{border-bottom:none}
 .r-stat .lbl{font-size:13px;color:var(--dim)}
 .r-stat .val{font-size:17px;font-weight:900;color:var(--gold)}
-
+ 
 /* LEADERBOARD */
 #lbScreen{gap:16px;justify-content:flex-start;padding-top:28px}
 .lb-wrap{width:100%;max-width:660px}
@@ -126,7 +126,7 @@ textarea{resize:vertical;line-height:1.6}
 .lb-cls{font-size:11px;color:var(--dim);margin-top:2px}
 .lb-time{color:var(--gold);font-weight:900;font-variant-numeric:tabular-nums;text-align:right}
 .lb-empty{text-align:center;padding:44px 20px;color:var(--dim);font-size:15px}
-
+ 
 /* OVERLAYS */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(5px)}
 .overlay.on{display:flex}
@@ -137,7 +137,7 @@ textarea{resize:vertical;line-height:1.6}
 .code-block{background:#06040e;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:12px;font-family:monospace;font-size:11px;color:#98e090;overflow:auto;white-space:pre;margin:10px 0;max-height:180px;line-height:1.6}
 .tip{font-size:13px;color:var(--dim);line-height:1.85}
 .tip strong{color:var(--text)}
-
+ 
 /* ═══════════════════════════════
    ADMIN PANEL
 ═══════════════════════════════ */
@@ -215,7 +215,7 @@ textarea{resize:vertical;line-height:1.6}
   .adm-logo,.adm-nav-section,.adm-exit{display:none}
   .answer-grid{grid-template-columns:1fr}
 }
-
+ 
 /* improve tag */
 .improve-tag{
   display:flex;align-items:center;justify-content:center;
@@ -226,12 +226,26 @@ textarea{resize:vertical;line-height:1.6}
 .improve-tag.new{background:rgba(123,82,208,.18);border:1px solid rgba(123,82,208,.45);color:#c5a8e8}
 .improve-tag.better{background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.5);color:var(--gold)}
 .improve-tag.same{background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.1);color:var(--dim)}
+ 
+/* FAIL screen */
+#failScreen{gap:14px;text-align:center}
+#failScreen .r-stat{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+#failScreen .r-stat:last-child{border-bottom:none}
+#failScreen .lbl{font-size:13px;color:var(--dim)}
+#failScreen .val{font-size:17px;font-weight:900;color:#e87070}
+/* wrong shake */
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.shake{animation:shake .4s ease}
+/* life indicator */
+.life-row{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--dim)}
+.life-icon{font-size:18px;transition:all .3s}
+.life-icon.lost{opacity:.2;filter:grayscale(1)}
 </style>
 </head>
 <body>
 <div id="stars"></div>
 <div id="toast"></div>
-
+ 
 <!-- PASSWORD MODAL -->
 <div class="overlay" id="pwModal">
   <div class="modal" style="max-width:360px">
@@ -243,7 +257,7 @@ textarea{resize:vertical;line-height:1.6}
     <div class="btn-row"><button class="btn btn-ghost" onclick="closePwModal()">取消</button><button class="btn btn-gold" onclick="checkPw()">🔓 登入</button></div>
   </div>
 </div>
-
+ 
 <!-- GAS MODAL -->
 <div class="overlay" id="gasModal">
   <div class="modal">
@@ -253,7 +267,7 @@ textarea{resize:vertical;line-height:1.6}
     <div class="code-block" id="gasCode">const SHEET_ID = 'YOUR_GOOGLE_SHEET_ID';
 const SHEET = '排行榜';
 // 欄位：A時間戳記 B姓名 C班級 D秒數 E提示次數 F勳章等級 G勳章 H挑戰次數
-
+ 
 function doPost(e) {
   const lock = LockService.getScriptLock();
   lock.tryLock(5000);
@@ -267,7 +281,7 @@ function doPost(e) {
         '完成時間(秒)','提示次數','勳章等級','勳章','挑戰次數']);
       sh.getRange(1,1,1,8).setFontWeight('bold').setBackground('#f3e8c0');
     }
-
+ 
     const key = d.name + '||' + d.cls;
     const allRows = sh.getDataRange().getValues();
     let existRow = -1;
@@ -277,14 +291,14 @@ function doPost(e) {
         break;
       }
     }
-
+ 
     const now = new Date().toLocaleString('zh-TW');
     const isBetter = (nM,nS,nH,oM,oS,oH) => {
       if (nM !== oM) return nM < oM;
       if (nS !== oS) return nS < oS;
       return nH < oH;
     };
-
+ 
     if (existRow === -1) {
       sh.appendRow([now,d.name,d.cls,d.seconds,
         d.hints,d.medalLevel,d.medal,1]);
@@ -310,7 +324,7 @@ function doPost(e) {
     return out({success:false,error:err.message});
   } finally { lock.releaseLock(); }
 }
-
+ 
 function doGet(e) {
   if (e.parameter.action !== 'lb') return out([]);
   const ss = SpreadsheetApp.openById(SHEET_ID);
@@ -334,7 +348,7 @@ function out(data){
     <div class="btn-row"><button class="btn btn-ghost btn-sm" onclick="copyGas()">📋 複製程式碼</button><button class="btn btn-gold" onclick="saveGas()">✅ 儲存</button></div>
   </div>
 </div>
-
+ 
 <!-- TITLE -->
 <div class="screen active z" id="titleScreen">
   <div class="title-emoji">📚</div>
@@ -346,11 +360,10 @@ function out(data){
     <button class="btn btn-purple" onclick="showLb()">🏆 榮譽排行榜</button>
   </div>
   <div class="btn-row">
-    <button class="btn btn-ghost btn-sm" onclick="openGas()">⚙️ 後端設定</button>
     <button class="btn btn-ghost btn-sm" onclick="openPwModal()">🛠️ 管理員後台</button>
   </div>
 </div>
-
+ 
 <!-- REGISTER -->
 <div class="screen z" id="registerScreen">
   <div class="card">
@@ -372,12 +385,17 @@ function out(data){
     <div style="margin-top:10px;text-align:center"><button class="btn btn-ghost btn-sm" onclick="go('titleScreen')">← 返回</button></div>
   </div>
 </div>
-
+ 
 <!-- GAME -->
 <div class="screen z" id="gameScreen">
   <div class="g-header">
     <div class="g-player"><div class="g-avatar" id="gAvatar">📖</div><div><div class="g-name" id="gName">玩家</div><div class="g-cls" id="gCls">班級</div></div></div>
     <div class="stage-pill" id="gPill">第 1 關</div>
+    <div class="life-row" id="lifeRow">
+      <span class="life-icon" id="life1">❤️</span>
+      <span class="life-icon" id="life2">❤️</span>
+      <span class="life-icon" id="life3">❤️</span>
+    </div>
     <div class="g-timer" id="gTimer">00:00</div>
   </div>
   <div class="g-body">
@@ -400,10 +418,31 @@ function out(data){
         <div class="sc-msg" id="scMsg">你找到了線索！</div>
         <button class="btn btn-gold" id="scBtn" onclick="nextStage()">🚪 下一關</button>
       </div>
+      <!-- 失敗警告 -->
+      <div id="qFailWarn" style="display:none;margin-top:10px;padding:10px 14px;border-radius:8px;background:rgba(192,57,43,.16);border:1px solid rgba(192,57,43,.4);color:#e87070;font-size:13px;text-align:center;animation:fdIn .3s"></div>
     </div>
   </div>
 </div>
-
+ 
+<!-- FAIL -->
+<div class="screen z" id="failScreen">
+  <div style="font-size:80px;animation:flt 3s ease-in-out infinite">💀</div>
+  <div class="cinzel" style="font-size:28px;color:#e74c3c;text-shadow:0 0 40px rgba(231,76,60,.6);margin-top:8px">任務失敗</div>
+  <div style="font-size:14px;color:var(--dim);margin-top:4px;letter-spacing:2px">MISSION FAILED</div>
+  <div style="background:linear-gradient(145deg,rgba(192,57,43,.18),rgba(14,12,26,.98));border:1px solid rgba(192,57,43,.35);border-radius:var(--radius);padding:22px 30px;width:100%;max-width:440px;margin-top:16px">
+    <div class="r-stat"><span class="lbl">👤 姓名</span><span class="val" id="failName">—</span></div>
+    <div class="r-stat"><span class="lbl">🏫 班級</span><span class="val" id="failCls">—</span></div>
+    <div class="r-stat"><span class="lbl">💀 失敗關卡</span><span class="val" id="failStage">—</span></div>
+    <div class="r-stat"><span class="lbl">❌ 失敗原因</span><span class="val" id="failReason" style="font-size:14px;color:#e87070">—</span></div>
+    <div class="r-stat"><span class="lbl">⏱️ 已用時間</span><span class="val" id="failTime">—</span></div>
+  </div>
+  <div style="font-size:13px;color:var(--dim);max-width:380px;text-align:center;line-height:1.8;margin-top:4px">密室的封印重新鎖上了⋯<br>重新整理思緒，再次挑戰！</div>
+  <div class="btn-row">
+    <button class="btn btn-gold" onclick="restartGame()">🔁 重新挑戰</button>
+    <button class="btn btn-ghost" onclick="go('titleScreen')">← 返回主頁</button>
+  </div>
+</div>
+ 
 <!-- RESULT -->
 <div class="screen z" id="resultScreen">
   <div class="res-trophy" id="resTrophy">🏆</div>
@@ -419,7 +458,7 @@ function out(data){
   <div id="improveMsg" class="improve-tag" style="display:none"></div>
   <div class="btn-row"><button class="btn btn-purple" onclick="showLb()">🏆 查看排行榜</button><button class="btn btn-ghost" onclick="restartGame()">🔁 再挑戰</button></div>
 </div>
-
+ 
 <!-- LEADERBOARD -->
 <div class="screen z" id="lbScreen">
   <div class="lb-wrap">
@@ -435,7 +474,7 @@ function out(data){
     <div class="btn-row" style="margin-top:16px"><button class="btn btn-ghost btn-sm" onclick="loadLb()">🔄 重新整理</button><button class="btn btn-ghost" onclick="go('titleScreen')">← 返回主頁</button></div>
   </div>
 </div>
-
+ 
 <!-- ═══════════════════════════════════════
      ADMIN SCREEN
 ═══════════════════════════════════════ -->
@@ -453,7 +492,7 @@ function out(data){
       <button class="adm-exit" onclick="admLogout()">🚪 退出後台</button>
     </div>
     <div class="adm-main" id="admMain">
-
+ 
       <!-- ROOMS -->
       <div id="admRooms">
         <div class="adm-title">📚 關卡題目管理</div>
@@ -492,7 +531,7 @@ function out(data){
           </div>
         </div>
       </div>
-
+ 
       <!-- SETTINGS -->
       <div id="admSettings" style="display:none">
         <div class="adm-title">⚙️ 系統設定</div>
@@ -522,7 +561,7 @@ function out(data){
           <div class="btn-row" style="justify-content:flex-start;margin-top:12px"><button class="btn btn-gold btn-sm" onclick="saveMedalSettings()">💾 儲存勳章設定</button></div>
         </div>
       </div>
-
+ 
       <!-- PASSWORD -->
       <div id="admPw" style="display:none">
         <div class="adm-title">🔑 修改密碼</div>
@@ -535,28 +574,28 @@ function out(data){
           <div class="btn-row" style="justify-content:flex-start;margin-top:4px"><button class="btn btn-gold btn-sm" onclick="changePw()">🔑 更新密碼</button></div>
         </div>
       </div>
-
+ 
     </div>
   </div>
 </div>
-
+ 
 <script>
 // ═══════════════ CONFIG ═══════════════
 let GAS_URL = localStorage.getItem('gasUrl')||'https://script.google.com/macros/s/AKfycbzr7vor8mLzTnP4UuSwUP5QXvk7Aa_x-1PcXrZg5Vj71XBkntcdwD7eXf-aic87FCY/exec';
 let ADMIN_PW = localStorage.getItem('adminPw')||'admin1234';
 const EMOJIS=['📜','🔮','🗝️','🏺','🌿','🌊','🔬','🎭','🗺️','🎨','⚗️','🌟','📖','🏛️','🔭','🧬','🎯','🌙','⚔️','🦋','🌈','🔥','💡','🧩','🎪','🏰','🌺','🦉'];
-
+ 
 function loadRooms(){const s=localStorage.getItem('escapeRooms');if(s)try{return JSON.parse(s)}catch(e){}return defaultRooms()}
 function saveRooms(){localStorage.setItem('escapeRooms',JSON.stringify(ROOMS))}
 function loadMedals(){const s=localStorage.getItem('medalCfg');if(s)try{return JSON.parse(s)}catch(e){}return defaultMedals()}
 function defaultMedals(){return[{id:'💎',label:'鑽石',order:0,maxSec:180,maxHints:0},{id:'🥇',label:'黃金',order:1,maxSec:300,maxHints:3},{id:'🥈',label:'白銀',order:2,maxSec:480,maxHints:99},{id:'🥉',label:'青銅',order:3,maxSec:99999,maxHints:99}]}
-
+ 
 let ROOMS=loadRooms();
 let MEDALS=loadMedals();
 function getMedal(sec,hints){for(const m of MEDALS)if(sec<=m.maxSec&&hints<=m.maxHints)return m;return MEDALS[MEDALS.length-1]}
-
+ 
 function defaultRooms(){return[
-
+ 
 // ══ 關 1：古老圖書館 ══ 舊題×2 + 連續文本×1 + 非連續文本×1
 {emoji:'📜',name:'古老圖書館',
 story:'塵封的書架散發神秘光芒，鑄鐵大鎖鎖住了出路。解開這三道閱讀之謎，才能打開第一扇門…',
@@ -571,7 +610,7 @@ clue:'書架後方的暗格打開了，你找到了一把古老的鑰匙！',qs:
    ch:['今天之前還清','明天（週二）還書即可','後天（週三）還書','下週一才要罰款'],a:1,
    h:'週一公休不計入逾期，週二恢復開放時再還即可，不會有罰款。'}
 ]},
-
+ 
 // ══ 關 2：星象預言室 ══ 舊題×1 + 連續文本×1 + 非連續文本×1 + 混合文本×1
 {emoji:'🔮',name:'星象預言室',
 story:'佈滿星圖的圓頂房間，水晶球中浮現文本的謎題。集中精神，方能繼續前進…',
@@ -590,7 +629,7 @@ clue:'水晶球發出耀眼光芒，第三道門的密碼顯現！',qs:[
    ch:['甲班','乙班','丙班','丁班'],a:1,
    h:'乙班人均 7.8 冊為最高，對照規則「人均最多」即為第一名。'}
 ]},
-
+ 
 // ══ 關 3：鑄鐵密鑰室 ══ 舊題×2 + 連續文本×2
 {emoji:'🗝️',name:'鑄鐵密鑰室',
 story:'牆上刻滿文學符號，三把鑄鐵鎖扣住大門。答對這些題，第三道門將為你開啟…',
@@ -606,7 +645,7 @@ clue:'鑄鐵鎖碎裂！你找到了通往第四間密室的密道！',qs:[
    ch:['台灣的漁業收入將會減少','部分魚種可能在二十年內消失','海水溫度正在升高','漁民的生活將更加艱難'],a:1,
    h:'文章明確說明「科學家指出，部分魚種可能在二十年內消失」。'}
 ]},
-
+ 
 // ══ 關 4：古文物陳列室 ══ 舊題×1 + 非連續文本×2 + 混合文本×1
 {emoji:'🏺',name:'古文物陳列室',
 story:'玻璃展示櫃中放著古老的文物，每件文物旁都有謎語標籤。只有博學之人才能通過…',
@@ -625,7 +664,7 @@ clue:'展示櫃底部的抽屜彈開，裡面有一張地圖！',qs:[
    ch:['一定可以，因為還在截止日前','不一定，還要看名額是否已滿','不行，因為他是五年級','不行，因為他看到廣告太晚了'],a:1,
    h:'截止日 6/20 尚未到期，但廣告明確說明「額滿為止」，所以不一定能報名成功。'}
 ]},
-
+ 
 // ══ 關 5：植物標本室 ══ 舊題×2 + 連續文本×1 + 非連續文本×1
 {emoji:'🌿',name:'植物標本室',
 story:'乾燥的花草標本貼滿四壁，瓶瓶罐罐散發著淡淡書香。窗上的密碼鎖在等你解開…',
@@ -641,7 +680,7 @@ clue:'窗鎖彈開了，清新的空氣湧入！第五間密室的入口在窗�
    ch:['兩樣都放入紙類回收桶','雜誌放入紙類回收桶，紙杯另外處理','兩樣都不能放入紙類回收桶','紙杯放入紙類回收桶，雜誌另外處理'],a:1,
    h:'標示說明雜誌「可放入」，紙杯「不可放入」，應分開處理。'}
 ]},
-
+ 
 // ══ 關 6：海圖測繪室 ══ 舊題×1 + 連續文本×1 + 非連續文本×1 + 混合文本×1
 {emoji:'🌊',name:'海圖測繪室',
 story:'巨大的海圖掛滿四壁，羅盤和六分儀散落桌上。指南針指向正確答案，你找得到嗎？',
@@ -660,7 +699,7 @@ clue:'羅盤的隱藏面板開了，裡面藏著第七關的鑰匙！',qs:[
    ch:['借書數量與季節有關','11月活動推出後借書數量明顯上升','12月因為考試所以借更多書','活動對借書數量沒有影響'],a:1,
    h:'11月活動推出後數據確實上升，雖不能完全確定因果，但這是最合理的推論。'}
 ]},
-
+ 
 // ══ 關 7：科學研究室 ══ 舊題×1 + 連續文本×2 + 非連續文本×1
 {emoji:'🔬',name:'科學研究室',
 story:'試管和燒杯排列整齊，黑板上寫滿了公式與假設。這裡的謎題需要邏輯思維才能解開！',
@@ -679,7 +718,7 @@ clue:'實驗台底部的暗格啟動，噴出了一張解鎖密碼紙！',qs:[
    ch:['介紹塑膠的製造過程','說明海洋生物的種類','警示塑膠污染的嚴重性，呼籲重視','描述科學家的研究方法'],a:2,
    h:'文章列舉具體數據和後果，目的是讓讀者意識到問題的嚴重性。'}
 ]},
-
+ 
 // ══ 關 8：戲劇排練室 ══ 舊題×1 + 混合文本×2 + 非連續文本×1
 {emoji:'🎭',name:'戲劇排練室',
 story:'空曠的舞台中央只有一盞燈，劇本散落一地。必須讀懂這些文字，才能演好最重要的角色…',
@@ -698,7 +737,7 @@ clue:'一個信封從天花板落下，裡面有通往第九關的邀請函！',
    ch:['60 分鐘','70 分鐘','80 分鐘','90 分鐘'],a:2,
    h:'三部分 90 分鐘 + 兩次休息 20 分鐘 = 共 110 分鐘。14:00 開始，15:50 結束。14:30 到達距結束剩 80 分鐘。'},
 ]},
-
+ 
 // ══ 關 9：地理探索室 ══ 舊題×1 + 連續文本×1 + 非連續文本×1 + 混合文本×1
 {emoji:'🗺️',name:'地理探索室',
 story:'巨大的世界地圖從天花板垂掛而下，每個大陸都藏著一個謎題。你的閱讀地圖在哪裡？',
@@ -717,7 +756,7 @@ clue:'南極洲標記旁的機關鬆動了，第十關的路在腳下開啟！',
    ch:['生態觀察區是禁止進入的紅色區域','整個路線不包含補水站','學生可以在服務站補充飲水後再前往生態觀察區','水域區域是路線的終點'],a:2,
    h:'路線說明服務站在補水點，圖例說明服務站有黃色旗幟，生態觀察區在綠色區域，順序符合。'}
 ]},
-
+ 
 // ══ 關 10：藝術工作室 ══ 舊題×1 + 連續文本×1 + 非連續文本×1 + 混合文本×1
 {emoji:'🎨',name:'藝術工作室',
 story:'畫布、雕塑和色彩斑斕的作品充滿整個空間。創意的謎題就藏在美麗的藝術之中…',
@@ -736,7 +775,7 @@ clue:'一幅畫的背面貼著第十一關的入口座標！',qs:[
    ch:['林大為晚年才學習水墨畫','《晨霧中的山》可能大量使用空白來呈現霧氣','評論者認為這幅畫太過簡單','水墨畫一定比油畫更有價值'],a:1,
    h:'評論說林大為「善用留白技法」，說明牌主題是「晨霧」，兩者結合可推論畫中留白用來表現霧氣。'}
 ]},
-
+ 
 // ══ 關 11：煉金術士的研究室 ══ 舊題×1 + 連續文本×1 + 非連續文本×1 + 混合文本×1
 {emoji:'⚗️',name:'煉金術士的研究室',
 story:'古老的爐火閃爍，神秘的符文覆蓋著牆面。煉金術士留下了謎題——能量就藏在正確答案中！',
@@ -755,7 +794,7 @@ clue:'神秘的爐火變成了金色，長廊盡頭的最終密室就在眼前�
    ch:['班上所有閱讀不足的學生語文成績一定較差','班上約有40%的學生符合研究建議的閱讀量','讀30分鐘以上的學生語文成績一定是全班最高','這個研究結果不可信'],a:1,
    h:'調查顯示40%的學生每日閱讀30分鐘以上，這與研究建議相符，是最直接可推論的事實。'}
 ]},
-
+ 
 // ══ 關 12：最終聖殿 ══ 舊題×1 + 連續文本×1 + 非連續文本×1 + 混合文本×1
 {emoji:'🌟',name:'最終聖殿',
 story:'你已走過 11 間密室！眼前這座金光閃閃的聖殿，就是最後的考驗。集結所有閱讀力量，打開自由之門！',
@@ -775,21 +814,28 @@ clue:'🎉 聖殿的大門轟然開啟——你自由了！閱讀力量萬歲！
    h:'公告條件是完成率80%以上，三至六年級達到80%，一年級（75%）和二年級（60%）均未達標，所以只有三到六年級獲得榮譽旗。'}
 ]}
 ]}
-
+ 
 // ═════════ GAME STATE ═════════
 let S={};let timerIv=null;let lbData=[];let currentTab='全部';
-function initState(){S={name:'',cls:'',stage:0,q:0,secs:0,hints:0,hintUsed:false,answered:false}}
-
+function initState(){
+  S={
+    name:'',cls:'',stage:0,q:0,secs:0,hints:0,
+    hintUsed:false,answered:false,
+    wrongCount:0,   // 當前題目錯誤次數（最多3次）
+    globalFails:0   // 全局失敗次數（最多3次）
+  }
+}
+ 
 // ═════════ HELPERS ═════════
 function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active')}
 function toast(msg,ms=2500){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),ms)}
 function fmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function updateCounts(){const n=ROOMS.length;document.getElementById('titleRoomCount').textContent=n+' 個密室';document.getElementById('regRoomCount').textContent=n+' 關'}
-
+ 
 // Stars
 (function(){const bg=document.getElementById('stars');for(let i=0;i<90;i++){const s=document.createElement('div');s.className='st';const sz=Math.random()<.7?1:2;s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${2+Math.random()*5}s;--dl:${Math.random()*6}s;--op:${.2+Math.random()*.8}`;bg.appendChild(s)}})();
-
+ 
 // ═════════ GAME ═════════
 function startGame(){
   const name=document.getElementById('pName').value.trim();
@@ -800,7 +846,7 @@ function startGame(){
   initState();S.name=name;S.cls=cls;
   document.getElementById('gName').textContent=name;
   document.getElementById('gCls').textContent=cls;
-  go('gameScreen');startTimer();renderRoom();
+  go('gameScreen');startTimer();updateLifeDisplay();renderRoom();
 }
 function startTimer(){clearInterval(timerIv);const el=document.getElementById('gTimer');timerIv=setInterval(()=>{S.secs++;el.textContent=fmt(S.secs);el.classList.toggle('warn',S.secs>360)},1000)}
 function stopTimer(){clearInterval(timerIv)}
@@ -813,11 +859,14 @@ function renderRoom(){
   document.getElementById('sc').classList.remove('on');
   document.getElementById('qBox').style.display='';
   const card=document.getElementById('roomCard');card.style.animation='none';requestAnimationFrame(()=>{card.style.animation=''});
+  const warn=document.getElementById('qFailWarn');
+  if(warn){warn.style.display='none';warn.innerHTML=''}
+  updateLifeDisplay();
   updateProg();renderQ();
 }
 function renderQ(){
   const room=ROOMS[S.stage];const q=room.qs[S.q];
-  S.answered=false;S.hintUsed=false;
+  S.answered=false;S.hintUsed=false;S.wrongCount=0;
   document.getElementById('qMeta').textContent=`問題 ${S.q+1} / ${room.qs.length}`;
   document.getElementById('qText').textContent=q.q;
   const keys=['Ａ','Ｂ','Ｃ','Ｄ'];
@@ -826,6 +875,8 @@ function renderQ(){
   document.getElementById('fb').className='fb';document.getElementById('fb').innerHTML='';
   document.getElementById('hBox').classList.remove('on');document.getElementById('hBox').textContent='';
   document.getElementById('hLbl').textContent='💡 提示：1 次';document.getElementById('hBtn').disabled=false;
+  const qw=document.getElementById('qFailWarn');
+  if(qw){qw.style.display='none';qw.innerHTML=''}
   updateProg();
 }
 function updateProg(){
@@ -837,14 +888,91 @@ function updateProg(){
   document.getElementById('progLbl').textContent=`進度 ${done}/${total} 題`;
 }
 function answer(idx){
-  if(S.answered)return;S.answered=true;
+  if(S.answered)return;
   const q=ROOMS[S.stage].qs[S.q];
-  const btns=document.querySelectorAll('.c-btn');btns.forEach(b=>b.disabled=true);
-  btns[idx].classList.add(idx===q.a?'correct':'wrong');btns[q.a].classList.add('correct');
+  const btns=document.querySelectorAll('.c-btn');
   const fb=document.getElementById('fb');
-  if(idx===q.a){fb.className='fb ok';fb.innerHTML='✅ 答對了！封印解除！';setTimeout(advQ,1100)}
-  else{fb.className='fb no';fb.innerHTML='❌ 答錯了！正確答案已標示，繼續加油！';setTimeout(advQ,1900)}
+  const warn=document.getElementById('qFailWarn');
+ 
+  if(idx===q.a){
+    // ✅ 答對
+    S.answered=true;
+    btns.forEach(b=>b.disabled=true);
+    btns[idx].classList.add('correct');
+    fb.className='fb ok';fb.innerHTML='✅ 答對了！封印解除！';
+    if(warn)warn.style.display='none';
+    setTimeout(advQ,1100);
+  } else {
+    // ❌ 答錯
+    S.wrongCount++;
+    S.globalFails++;
+    btns[idx].classList.add('wrong');
+    // 抖動效果
+    btns[idx].classList.remove('shake');
+    void btns[idx].offsetWidth;
+    btns[idx].classList.add('shake');
+    setTimeout(()=>btns[idx].classList.remove('wrong','shake'),600);
+ 
+    updateLifeDisplay();
+ 
+    const qRemain=3-S.wrongCount;
+    const gRemain=3-S.globalFails;
+ 
+    if(S.globalFails>=3){
+      // 全局 3 次失敗 → 任務失敗
+      S.answered=true;
+      btns.forEach(b=>b.disabled=true);
+      btns[q.a].classList.add('correct');
+      fb.className='fb no';
+      fb.innerHTML='💀 失敗次數已達上限！任務失敗！';
+      setTimeout(()=>showFail('全局失敗次數達 3 次'),1200);
+    } else if(S.wrongCount>=3){
+      // 單題 3 次錯 → 任務失敗
+      S.answered=true;
+      btns.forEach(b=>b.disabled=true);
+      btns[q.a].classList.add('correct');
+      fb.className='fb no';
+      fb.innerHTML='💀 本題已失敗 3 次！任務失敗！';
+      setTimeout(()=>showFail('單題連錯 3 次'),1200);
+    } else {
+      // 還能繼續作答
+      fb.className='fb no';
+      fb.innerHTML='❌ 答錯了！請再試一次';
+      if(warn){
+        const msgs=[];
+        if(qRemain>0) msgs.push(`本題還剩 <strong>${qRemain}</strong> 次機會`);
+        msgs.push(`全局剩餘 <strong>${gRemain}</strong> 次失敗機會`);
+        warn.innerHTML='⚠️ '+msgs.join('　');
+        warn.style.display='block';
+      }
+      // 短暫禁用該選項，其他選項恢復可點
+      btns[idx].disabled=true;
+      setTimeout(()=>{
+        btns[idx].disabled=false;
+        fb.className='fb';fb.innerHTML='';
+      },800);
+    }
+  }
 }
+ 
+function updateLifeDisplay(){
+  const lives=[1,2,3];
+  lives.forEach(n=>{
+    const el=document.getElementById('life'+n);
+    if(el) el.className='life-icon'+(n<=S.globalFails?' lost':'');
+  });
+}
+ 
+function showFail(reason){
+  stopTimer();
+  document.getElementById('failName').textContent=S.name;
+  document.getElementById('failCls').textContent=S.cls;
+  document.getElementById('failStage').textContent='第 '+(S.stage+1)+' 關 第 '+(S.q+1)+' 題';
+  document.getElementById('failReason').textContent=reason;
+  document.getElementById('failTime').textContent=fmt(S.secs);
+  go('failScreen');
+}
+ 
 function advQ(){S.q++;if(S.q>=ROOMS[S.stage].qs.length)showStageEnd();else renderQ()}
 function useHint(){
   if(S.hintUsed){toast('⚠️ 每題只能提示一次');return}if(S.answered)return;
@@ -907,7 +1035,7 @@ async function submitScore(medal){
   }catch(e){el.textContent='⚠️ 提交失敗：'+e.message;el.style.color='#e87070'}
 }
 function restartGame(){go('registerScreen')}
-
+ 
 // ═════════ LEADERBOARD ═════════
 async function showLb(){go('lbScreen');loadLb()}
 async function loadLb(){
@@ -937,13 +1065,13 @@ function renderLb(){
   });
   html+='</tbody></table>';el.innerHTML=html;
 }
-
+ 
 // ═════════ GAS MODAL ═════════
 function openGas(){document.getElementById('gasIn').value=GAS_URL;document.getElementById('gasModal').classList.add('on')}
 function closeGas(){document.getElementById('gasModal').classList.remove('on')}
 function saveGas(){const url=document.getElementById('gasIn').value.trim();if(url&&!url.startsWith('https://script.google.com')){toast('⚠️ 請輸入正確 GAS 網址');return}GAS_URL=url;localStorage.setItem('gasUrl',url);closeGas();toast('✅ 設定已儲存！')}
 function copyGas(){navigator.clipboard.writeText(document.getElementById('gasCode').textContent).then(()=>toast('✅ 程式碼已複製！'))}
-
+ 
 // ═════════ PASSWORD MODAL ═════════
 function openPwModal(){document.getElementById('pwInput').value='';document.getElementById('pwError').classList.remove('on');document.getElementById('pwModal').classList.add('on');setTimeout(()=>document.getElementById('pwInput').focus(),100)}
 function closePwModal(){document.getElementById('pwModal').classList.remove('on')}
@@ -951,13 +1079,13 @@ function checkPw(){
   if(document.getElementById('pwInput').value===ADMIN_PW){closePwModal();openAdmin()}
   else{document.getElementById('pwError').classList.add('on');document.getElementById('pwInput').value='';document.getElementById('pwInput').focus()}
 }
-
+ 
 // ═════════ ADMIN ═════════
 let curRoom=-1;
-
+ 
 function openAdmin(){go('adminScreen');admNav('rooms')}
 function admLogout(){curRoom=-1;go('titleScreen');toast('已退出管理後台')}
-
+ 
 function admNav(s){
   ['rooms','settings','pw'].forEach(id=>{
     document.getElementById('adm'+id.charAt(0).toUpperCase()+id.slice(1)).style.display=s===id?'':'none';
@@ -966,7 +1094,7 @@ function admNav(s){
   if(s==='rooms')renderAdmRoomList();
   if(s==='settings')loadAdmSettings();
 }
-
+ 
 function renderAdmRoomList(){
   const totalQ=ROOMS.reduce((a,r)=>a+r.qs.length,0);
   document.getElementById('admStats').innerHTML=`
@@ -989,14 +1117,14 @@ function renderAdmRoomList(){
     </div>`).join('');
   updateCounts();
 }
-
+ 
 function moveRoom(i,d){
   const t=i+d;if(t<0||t>=ROOMS.length)return;
   [ROOMS[i],ROOMS[t]]=[ROOMS[t],ROOMS[i]];
   if(curRoom===i)curRoom=t;else if(curRoom===t)curRoom=i;
   saveRooms();renderAdmRoomList();toast('✅ 順序已更新');
 }
-
+ 
 function editRoom(i){
   curRoom=i;const room=ROOMS[i];
   document.getElementById('admQEditor').style.display='';
@@ -1010,9 +1138,9 @@ function editRoom(i){
   document.getElementById('admQEditor').scrollIntoView({behavior:'smooth'});
   renderAdmRoomList();
 }
-
+ 
 function closeQEditor(){document.getElementById('admQEditor').style.display='none';curRoom=-1;renderAdmRoomList()}
-
+ 
 function renderEmojiPicker(sel){
   document.getElementById('emojiPicker').innerHTML=EMOJIS.map(e=>`<button class="ep-btn ${e===sel?'sel':''}" onclick="selEmoji('${e}')">${e}</button>`).join('');
 }
@@ -1021,10 +1149,10 @@ function selEmoji(e){
   document.getElementById('metaEmojiDisplay').textContent=e;
   renderEmojiPicker(e);setSI(false);
 }
-
+ 
 function setSI(saved){const el=document.getElementById('saveIndicator');el.className='save-indicator '+(saved?'saved':'unsaved');el.textContent=saved?'● 已儲存':'● 未儲存'}
 function metaChanged(){setSI(false)}
-
+ 
 function saveMeta(){
   if(curRoom<0)return;
   const name=document.getElementById('metaName').value.trim();
@@ -1036,18 +1164,18 @@ function saveMeta(){
   document.getElementById('qEdRoomName').textContent=`${ROOMS[curRoom].emoji} ${name}`;
   setSI(true);renderAdmRoomList();toast('✅ 密室資訊已儲存');
 }
-
+ 
 function addRoom(){
   ROOMS.push({emoji:'📖',name:'新密室',story:'這間密室藏著神秘的謎題，等待你來解開…',clue:'你找到了前往下一關的線索！',qs:[{q:'請輸入題目',ch:['選項甲','選項乙','選項丙','選項丁'],a:0,h:'提示文字'}]});
   saveRooms();toast('✅ 新增關卡成功');editRoom(ROOMS.length-1);
 }
-
+ 
 function deleteRoom(){
   if(curRoom<0)return;
   if(!confirm(`確定要刪除「${ROOMS[curRoom].name}」嗎？`))return;
   ROOMS.splice(curRoom,1);saveRooms();closeQEditor();toast('🗑️ 已刪除關卡');
 }
-
+ 
 // Question list
 function renderQList(){
   if(curRoom<0)return;
@@ -1057,7 +1185,7 @@ function renderQList(){
   if(!room.qs.length){document.getElementById('qList').innerHTML='<div style="color:var(--dim);font-size:13px;padding:10px 0">尚無題目，點選下方「新增題目」</div>';return}
   document.getElementById('qList').innerHTML=room.qs.map((q,qi)=>renderQCard(qi,q)).join('');
 }
-
+ 
 function renderQCard(qi,q){
   const keys=['Ａ','Ｂ','Ｃ','Ｄ'];
   const maxQ=curRoom>=0?ROOMS[curRoom].qs.length:99;
@@ -1081,7 +1209,7 @@ function renderQCard(qi,q){
     <div class="ig" style="margin:0"><label>💡 提示文字</label><input value="${esc(q.h)}" placeholder="提示…" oninput="setHint(${qi},this.value)"></div>
   </div>`;
 }
-
+ 
 function setQText(qi,v){if(curRoom<0)return;ROOMS[curRoom].qs[qi].q=v;setSI(false)}
 function setChoice(qi,ci,v){if(curRoom<0)return;ROOMS[curRoom].qs[qi].ch[ci]=v;setSI(false)}
 function setAns(qi,ci){
@@ -1090,26 +1218,26 @@ function setAns(qi,ci){
   if(card)card.querySelectorAll('.answer-opt').forEach((el,i)=>el.classList.toggle('correct-ans',i===ci));
 }
 function setHint(qi,v){if(curRoom<0)return;ROOMS[curRoom].qs[qi].h=v;setSI(false)}
-
+ 
 function addQuestion(){
   if(curRoom<0)return;
   ROOMS[curRoom].qs.push({q:'請輸入題目',ch:['選項甲','選項乙','選項丙','選項丁'],a:0,h:'提示文字'});
   saveRooms();renderQList();setSI(false);
   setTimeout(()=>{const cs=document.querySelectorAll('.q-card');if(cs.length)cs[cs.length-1].scrollIntoView({behavior:'smooth'})},100);
 }
-
+ 
 function deleteQ(qi){
   if(curRoom<0)return;
   if(ROOMS[curRoom].qs.length<=1){toast('⚠️ 每關至少需要 1 道題目');return}
   if(!confirm('確定要刪除這道題目嗎？'))return;
   ROOMS[curRoom].qs.splice(qi,1);saveRooms();renderQList();setSI(true);
 }
-
+ 
 function moveQ(qi,d){
   if(curRoom<0)return;const qs=ROOMS[curRoom].qs;const t=qi+d;
   if(t<0||t>=qs.length)return;[qs[qi],qs[t]]=[qs[t],qs[qi]];saveRooms();renderQList();
 }
-
+ 
 // Auto-save
 let autoSaveTimer=null;
 document.addEventListener('input',e=>{
@@ -1118,7 +1246,7 @@ document.addEventListener('input',e=>{
     autoSaveTimer=setTimeout(()=>{saveRooms();setSI(true)},900);
   }
 });
-
+ 
 // Settings
 function loadAdmSettings(){
   document.getElementById('admGasIn').value=GAS_URL;
@@ -1138,7 +1266,7 @@ function saveMedalSettings(){
   localStorage.setItem('medalCfg',JSON.stringify(MEDALS));
   toast('✅ 勳章設定已儲存');
 }
-
+ 
 // Change Password
 function changePw(){
   const old=document.getElementById('oldPw').value;
@@ -1153,7 +1281,7 @@ function changePw(){
   ['oldPw','newPw','confirmPw'].forEach(id=>document.getElementById(id).value='');
   toast('✅ 密碼已成功更新！');
 }
-
+ 
 // Init
 updateCounts();
 </script>
